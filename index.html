@@ -1169,7 +1169,7 @@ function frame(now){let dt=Math.min(0.05,(now-last)/1000);last=now;time+=dt;
   else if(hitstop>0){hitstop-=dt}
   else{const sdt=slowmo>0?dt*0.3:dt;if(slowmo>0)slowmo-=dt;if(state!=='title'){worldUpdate(sdt);if(state==='play'&&player.st==='move')swingFx()}fxUpdate(sdt)}
   if(!paused){if(roomBanner>0)roomBanner-=dt;if(bossIntro>0)bossIntro-=dt;if(lastTargetT>0)lastTargetT-=dt;flash=Math.max(0,flash-dt);shake=Math.max(0,shake-dt*40);
-  if(fadeDir){fade+=fadeDir*dt*3;if(fade>=1&&fadeDir>0){fade=1;fadeDir=-1;const wasBoss=room.boss;loadRoom(roomI+1);player.hp=Math.min(player.max,player.hp+player.max*(wasBoss?(diffI===3?0.5:1):DF().heal));player.mp=player.mmp;for(const k in player.cds)player.cds[k]=0;if(room.ch===2&&wasBoss){chapterBanner=3.2;roomBanner=0}}if(fade<=0&&fadeDir<0){fade=0;fadeDir=0}}
+  if(fadeDir){fade+=fadeDir*dt*3;if(fade>=1&&fadeDir>0){fade=1;fadeDir=-1;const wasBoss=room.boss;loadRoom(roomI+1);player.hp=Math.min(player.max,player.hp+player.max*(wasBoss?(diffI===3?0.5:1):DF().heal));player.mp=Math.min(player.mmp,player.mp+player.mmp*(wasBoss?1:0.35));if(room.ch===2&&wasBoss){chapterBanner=3.2;roomBanner=0}}if(fade<=0&&fadeDir<0){fade=0;fadeDir=0}}
   if(player){const tx=clamp(player.x-W/2+player.face*70,0,(room?room.w:W)-W);camX+=(tx-camX)*Math.min(1,dt*5)}}
   musicSync2();
   ctx.save();if(shake>0)ctx.translate(rnd(-shake,shake)*0.5,rnd(-shake,shake)*0.35);
