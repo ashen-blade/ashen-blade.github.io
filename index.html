@@ -1220,7 +1220,7 @@ renderKeys();
 const TOUCH=matchMedia('(pointer:coarse)').matches;
 const PADB={};document.querySelectorAll('.pad [data-k]').forEach(b=>PADB[b.dataset.k]=b);
 function padCD(){const p=player;for(const nm of SKILLS){const b=PADB[SKILLKEY[nm]];if(!b)continue;const M=MOVES[nm],cd=Math.max(0,p.cds[nm]||0),f=cd>0?cd/M.cd:0,low=p.mp<M.mp;
-  const key=f.toFixed(2)+low;if(b._k===key)continue;b._k=key;
+  const key=(f>0?f.toFixed(2)+"|"+(cd<1?cd.toFixed(1):Math.ceil(cd)):"ready")+low;if(b._k===key)continue;b._k=key;
   b.style.backgroundImage=f>0?`conic-gradient(rgba(0,0,0,.8) ${f*360}deg, rgba(0,0,0,.35) 0)`:'';b.classList.toggle('cdw',f>0);b.classList.toggle('low',low&&f<=0);
   let sp=b.querySelector('.cdn');if(!sp){sp=document.createElement('span');sp.className='cdn';b.appendChild(sp)}sp.textContent=f>0?(cd<1?cd.toFixed(1):Math.ceil(cd)):''; if(f<=0&&b._was){b.classList.remove('rdy');void b.offsetWidth;b.classList.add('rdy')}b._was=f>0}}
 
