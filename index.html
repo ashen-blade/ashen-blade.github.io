@@ -383,7 +383,7 @@ function loadRoom(i){roomI=i;room=ROOMS[i];mons=[];shots=[];fxs=[];boss=null;gat
   for(const [t,x] of room.spawn)spawnEnemy(t,x);buildBg();roomBanner=2.2;if(room.boss){bossIntro=2.4;sfx('bossin')}}
 let roomBanner=0,bossIntro=0;
 let splits=[],chStart=0;
-function startGame(){auInit();player=newPlayer();runTime=0;splits=[];chStart=0;maxCombo=0;dmgTaken=0;combo.n=0;nums=[];imgs=[];loadRoom(0);state='play';ov.hidden=true;fade=1;fadeDir=-1}
+function startGame(){if(typeof track==='function')track('start');auInit();player=newPlayer();runTime=0;splits=[];chStart=0;maxCombo=0;dmgTaken=0;combo.n=0;nums=[];imgs=[];loadRoom(0);state='play';ov.hidden=true;fade=1;fadeDir=-1}
 
 // ---------- hit system ----------
 function hitbox(att,h){const f=att.face,x0=f>0?att.x+h.off:att.x-h.off-h.w,x1=f>0?att.x+h.off+h.w:att.x-h.off;return[x0,x1]}
@@ -1188,7 +1188,7 @@ function musicSync2(){if(!AU.ctx)return;setSong(state==='play'||state==='clear'?
 function showResult(win){const t=Math.floor(runTime),dmul=[0.7,1,1.25,1.5][diffI],score=(win?4000:0)+maxCombo*60-dmgTaken*0.6-t*8;const sc2=score*dmul;const rank=!win?'F':sc2>5200?'SSS':sc2>4400?'SS':sc2>3600?'S':sc2>2600?'A':'B';
   ovTitle.innerHTML=win?'던전 <span class="red">클리어</span>':'쓰러졌다';ovText.textContent=win?'혈월의 군주 발라크를 쓰러뜨리고 고성의 밤을 끝냈다.':'다시 도전해보자. 대쉬(L)로 공격을 뚫고 지나가고, 스킬을 이어서 써봐.';
   document.querySelectorAll('#ov .keys').forEach(e=>e.hidden=true);ovStats.hidden=false;ovStats.innerHTML=`<div><b>${rank}</b><span>랭크 · ${DF().nm}</span></div><div><b>${Math.floor(t/60)}:${String(t%60).padStart(2,'0')}</b><span>클리어 시간</span></div><div><b>${maxCombo}</b><span>최대 콤보</span></div><div><b>${dmgTaken.toLocaleString()}</b><span>받은 피해</span></div>`;
-  ovBtn.textContent='다시 도전';ov.hidden=false;const sp=splits.slice();if(win)sp.push(Math.floor(runTime-chStart));const recs=sp.map((v,i)=>({stage:i+1,time_sec:v})).filter(r=>r.time_sec>=30);if(win)recs.push({stage:0,time_sec:t});
+  ovBtn.textContent='다시 도전';ov.hidden=false;if(win&&typeof track==='function')track('clear');const sp=splits.slice();if(win)sp.push(Math.floor(runTime-chStart));const recs=sp.map((v,i)=>({stage:i+1,time_sec:v})).filter(r=>r.time_sec>=30);if(win)recs.push({stage:0,time_sec:t});
   if(recs.length&&typeof rankOffer==='function')rankOffer(recs.map(r=>Object.assign({diff:diffI,max_combo:maxCombo,dmg_taken:Math.round(dmgTaken),rank:win?rank:'B'},r)));else{const s=document.getElementById('rkSubmit');if(s)s.hidden=true;ovBtn.focus()}}
 ovBtn.addEventListener('click',startGame);
 // title backdrop
@@ -1296,6 +1296,12 @@ document.querySelectorAll('[data-rk]').forEach(b=>b.addEventListener('click',()=
 document.querySelectorAll('[data-st]').forEach(b=>b.addEventListener('click',()=>rkShow(rkTab,+b.dataset.st)));
 // hide submit box whenever a new run starts
 ovBtn.addEventListener('click',()=>{rkEl('rkSubmit').hidden=true;rkEl('rkPanel').hidden=true;rkPending=null});
+
+// ---------- anonymous visit counter (no personal data) ----------
+const VID=(()=>{let v=null;try{v=localStorage.getItem('ash_vid')}catch(e){}if(!v){v=(crypto.randomUUID?crypto.randomUUID():String(Math.random()).slice(2)+Date.now()).replace(/-/g,'').slice(0,24);try{localStorage.setItem('ash_vid',v)}catch(e){}}return v})();
+const DEVICE=matchMedia('(pointer:coarse)').matches?'mobile':'pc';
+function track(kind){try{fetch(`${SB_URL}/rest/v1/visits`,{method:'POST',keepalive:true,headers:Object.assign({Prefer:'return=minimal'},RKH),body:JSON.stringify({vid:VID,kind,device:DEVICE})}).catch(()=>{})}catch(e){}}
+track('open');
 </script>
 
 </body></html>
