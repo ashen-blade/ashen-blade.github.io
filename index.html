@@ -56,7 +56,9 @@ html.land header,html.land .foot,html.rot header,html.rot .foot{display:none}
 #rkSubmit{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;align-items:center}
 #rkSubmit[hidden],#rkPanel[hidden]{display:none}
 #rkName{background:#120e18;color:#fff;border:1px solid #4a3e5c;border-radius:8px;padding:8px 10px;font-size:16px;width:170px;font-family:inherit}
-#rkSend,#rkOpen{background:#2a2238;color:#ffd27a;border:1px solid #c9a04a;border-radius:999px;padding:7px 16px;font-size:14px}
+#tutBtn.new{border-color:#ffd27a;box-shadow:0 0 14px rgba(255,210,122,.7);animation:tutGlow 1.4s ease-in-out infinite}@keyframes tutGlow{50%{box-shadow:0 0 4px rgba(255,210,122,.2)}}
+.ovrow{display:flex;gap:14px;justify-content:center;align-items:center;flex-wrap:wrap}.ovrow #ovBtn{margin-top:0}
+#rkSend,#rkOpen,#tutBtn{background:#2a2238;color:#ffd27a;border:1px solid #c9a04a;border-radius:999px;padding:7px 16px;font-size:14px}
 #rkSend:disabled{opacity:.5}
 #rkMsg{width:100%;font-size:13px;color:#bdb3cc;min-height:1em}
 #ov>#rkPanel{position:absolute;inset:0;z-index:20;background:rgba(4,2,8,.86);display:flex;align-items:center;justify-content:center;padding:12px}
@@ -124,8 +126,7 @@ html.land #mutef,html.rot #mutef{display:block}
 <p id="diffDesc" class="diffd"></p>
 <div id="ovStats" hidden></div>
 <div id="rkSubmit" hidden><input id="rkName" maxlength="12" placeholder="닉네임 (1~12자)" autocomplete="off" enterkeyhint="done"><button type="button" id="rkSend">랭킹 등록</button><span id="rkMsg"></span></div>
-<button type="button" id="rkOpen">🏆 랭킹 보기</button>
-<button id="ovBtn">던전 입장</button>
+<div class="ovrow"><button type="button" id="tutBtn">📖 튜토리얼</button><button id="ovBtn">던전 입장</button><button type="button" id="rkOpen">🏆 랭킹 보기</button></div>
 <div id="rkPanel" hidden><div class="rkbox"><div class="rkhead"><b>명예의 전당</b><button type="button" id="rkClose" aria-label="닫기">✕</button></div>
 <div class="rktabs st" role="tablist"><button type="button" data-st="1">1장</button><button type="button" data-st="2">2장</button><button type="button" data-st="0">전체 클리어</button></div>
 <div class="rktabs" role="tablist"><button type="button" data-rk="0">초급자</button><button type="button" data-rk="1">중급자</button><button type="button" data-rk="2">고급자</button><button type="button" data-rk="3">마스터</button></div>
@@ -1429,6 +1430,63 @@ function ambTick(on){const c=AU.ctx,t=c.currentTime;if(!on){SW.amb=0;return}cons
     SW.amb=t+R(2.6,3.6)}
 }
 setInterval(sndTick,40);
+// ===================== tutorial: training yard before chapter 1 =====================
+ETYPE.dummy={nm:'훈련용 산적',hp:999999,spd:0,w:34,h:96,look:'grunt',base:'grunt',cut:'grunt',dummy:1,atk:{range:0,wind:9,dur:9,hit:{off:0,w:1,dmg:[0,0],kx:0}},cd:[99,99]};
+const TUTROOM={w:1400,nm:'잿빛 성채 · 훈련장',tut:1,spawn:[['dummy',760]]};
+const KT=(pc,mob)=>TOUCH?mob:pc;
+let tut=null;
+const TUTS=[
+  {t:'이동',d:()=>KT('W A S D 로 움직여 보세요','왼쪽 조이스틱으로 움직여 보세요'),n:1,k:'walk'},
+  {t:'달리기',d:()=>KT('A 나 D 를 빠르게 두 번 누르고 꾹 유지','조이스틱을 끝까지 밀면 달려요'),n:1,k:'run'},
+  {t:'점프',d:()=>KT('K 로 점프 (2번)','점프 버튼 (2번)'),n:2,k:'jump'},
+  {t:'대쉬',d:()=>KT('L (또는 Shift) 로 앞으로 대쉬 — 대쉬 중엔 무적!','대쉬 버튼 — 대쉬 중엔 무적!'),n:2,k:'dash'},
+  {t:'기본 콤보',d:()=>KT('J 를 연타해서 4연타 마무리까지 때리기','공격 버튼 연타로 4연타 마무리까지'),n:1,k:'a4'},
+  {t:'공중 공격',d:()=>KT('점프(K) 중에 J 로 때리기','점프 중에 공격 버튼'),n:2,k:'air'},
+  {t:'띄우기',d:()=>KT('U [올려베기] 로 적을 공중에 띄우기','[올려베기] 로 적을 공중에 띄우기'),n:1,k:'launch'},
+  {t:'공중 콤보',d:()=>KT('띄운 적이 떨어지기 전에 계속 때리기 (J, 점프+J)','띄운 적이 떨어지기 전에 계속 때리기'),n:4,k:'juggle'},
+  {t:'스킬',d:()=>KT('I 돌진 · O 회오리 · P 대지 가르기 · H 검기 · N 낙화 — 3가지 써보기','[돌진] [회오리] [대지 가르기] [검기] [낙화] 중 3가지 써보기'),n:3,k:'skills'},
+  {t:'스킬 캔슬',d:()=>KT('기본 공격 도중에 스킬을 누르면 끊김 없이 이어져요 (2번)','공격 도중에 스킬을 누르면 바로 이어져요 (2번)'),n:2,k:'cancel'},
+  {t:'각성기',d:()=>KT('SPACE [천열참] — 화면의 모든 적을 벱니다 (MP 55)','[각성] 버튼 — 화면의 모든 적을 벱니다 (MP 55)'),n:1,k:'ult'},
+  {t:'실전',d:()=>'산적 2마리를 처치하세요. 적이 공격 자세를 잡으면 대쉬로 피하기!',n:2,k:'kill',start:()=>{for(const e of mons)if(e.T.dummy)e.st='dead',e.t=0;mons=mons.filter(e=>!e.T.dummy);
+    for(const x of [p0x()+380,p0x()+520]){const e=spawnEnemy('grunt',clamp(x,200,room.w-80));e.hp=e.max=Math.round(e.max*0.5);e.aggro=true}}},
+];
+const p0x=()=>player?player.x:300;
+function tutGo(k,v){if(!tut||tut.done)return;const S=TUTS[tut.i];if(!S||S.k!==k||tut.ok>0)return;tut.c=Math.min(S.n,tut.c+(v||1));if(tut.c>=S.n){tut.ok=0.9;sfx('ready',true)}}
+let _tutNoTrack=0;const _trackT=track;track=function(k){if(k==='start'&&_tutNoTrack)return;_trackT(k)};
+function startTutorial(){_tutNoTrack=1;startGame();_tutNoTrack=0;tut={i:0,c:0,ok:0,done:false,walk:0,run:0,used:new Set(),js:'',ds:''};roomI=-1;room=TUTROOM;mons=[];shots=[];fxs=[];boss=null;gateOpen=false;
+  player.x=160;player.y=DEPTH*0.55;camX=0;for(const [t,x] of room.spawn)spawnEnemy(t,x);buildBg();roomBanner=2.2}
+// back to normal once the real game begins
+const _loadRoom0=loadRoom;loadRoom=function(i){const fromTut=room&&room.tut;_loadRoom0(i);
+  if(fromTut&&tut){tut=null;try{localStorage.setItem('ash_tut','1')}catch(e){}runTime=0;splits=[];chStart=0;maxCombo=0;dmgTaken=0;combo.n=0;const np=newPlayer();np.x=player.x;np.y=player.y;player=np;if(typeof track==='function')track('start')}};
+const _startGame0=startGame;startGame=function(){tut=null;_startGame0()};
+// detection hooks
+const _applyHitT=applyHit;applyHit=function(tg,h,att,opt){const p=player,mv=p&&p.move,air=tg.z>20||tg.st==='air';const r=_applyHitT(tg,h,att,opt);
+  if(r&&tut&&att===p){if(mv==='a4')tutGo('a4');if(mv==='air')tutGo('air');if(mv==='skA')tutGo('launch');else if(air)tutGo('juggle')}return r};
+const _startMoveT=startMove;startMove=function(name){const p=player,prev=p&&p.st==='move'?p.move:null;_startMoveT(name);
+  if(!tut)return;if(['skS','skD','skF','skW','skQ'].includes(name)&&!tut.used.has(name)){tut.used.add(name);tutGo('skills')}
+  if(MOVES[name].mp&&prev&&/^a\d$|^air$/.test(prev))tutGo('cancel');if(name==='skE')tutGo('ult')};
+const _killT=kill;kill=function(e){if(e.T.dummy){e.hp=e.max;return}const was=e.deadPending;_killT(e);if(!was&&tut&&!e.T.dummy)tutGo('kill')};
+const _hurtT=hurtPlayer;hurtPlayer=function(d,kx,knock){if(tut&&player)player.hp=Math.max(player.hp,player.max*0.5);_hurtT(d,kx,knock)};
+const _enemyUpdateT=enemyUpdate;enemyUpdate=function(e,dt){if(e.T.dummy){e.hp=e.max;if(e.st==='idle'||e.st==='walk'||e.st==='atk'){e.atk=null;e.st='idle';e.hitF-=dt;e.shk=Math.max(0,(e.shk||0)-dt);e.x+=e.vx*dt;e.vx*=Math.exp(-8*dt);e.face=player.x>e.x?1:-1;return}}_enemyUpdateT(e,dt)};
+const _worldUpdateT=worldUpdate;worldUpdate=function(dt){_worldUpdateT(dt);if(!tut||state!=='play')return;const p=player;
+  p.mp=Math.max(p.mp,p.mmp*0.8);for(const n in p.cds)if(p.cds[n]>1.2)p.cds[n]=1.2;
+  if(p.st==='walk'){tut.walk+=dt;if(tut.walk>1.2)tutGo('walk')}if(p.st==='run'){tut.run+=dt;if(tut.run>0.6)tutGo('run')}
+  if(p.st==='jump'&&tut.js!=='jump')tutGo('jump');tut.js=p.st;if(p.st==='back'&&tut.ds!=='back')tutGo('dash');tut.ds=p.st;
+  if(tut.ok>0){tut.ok-=dt;if(tut.ok<=0){tut.i++;tut.c=0;if(tut.i>=TUTS.length){tut.done=true;tut.i=TUTS.length;try{localStorage.setItem('ash_tut','1')}catch(e){}}else if(TUTS[tut.i].start)TUTS[tut.i].start()}}};
+// panel
+const _drawHudT=drawHud;drawHud=function(){_drawHudT();if(!tut||state!=='play')return;
+  const w=Math.min(560,W-60),x=W/2-w/2,y=98,S=TUTS[tut.i];ctx.save();ctx.fillStyle='rgba(10,8,18,.8)';rr(x,y,w,tut.done?66:78,10);ctx.fill();ctx.strokeStyle=tut.ok>0||tut.done?'rgba(255,210,122,.95)':'rgba(201,160,74,.6)';ctx.lineWidth=2;ctx.stroke();
+  ctx.textAlign='center';ctx.textBaseline='alphabetic';
+  if(tut.done){ctx.font='20px "Black Han Sans", sans-serif';outlined('튜토리얼 완료!',W/2,y+28,'#ffd27a',3);ctx.font='14px Jua, sans-serif';outlined('오른쪽 문으로 가면 바로 1장이 시작돼요 →',W/2,y+52,'#fff',3);ctx.restore();return}
+  ctx.font='12px Jua, sans-serif';outlined(`튜토리얼 ${tut.i+1} / ${TUTS.length}`,W/2,y+17,'#b9a98a',3);
+  ctx.font='20px "Black Han Sans", sans-serif';outlined(tut.ok>0?'✔ '+S.t+' 완료!':S.t,W/2,y+40,tut.ok>0?'#7dff9a':'#ffd27a',3);
+  ctx.font='14px Jua, sans-serif';outlined(S.d(),W/2,y+60,'#fff',3);
+  if(S.n>1){const bw=w-60;ctx.fillStyle='rgba(0,0,0,.6)';rr(x+30,y+67,bw,5,2);ctx.fill();ctx.fillStyle='#ffd27a';rr(x+30,y+67,bw*tut.c/S.n,5,2);ctx.fill()}
+  ctx.font='11px Jua, sans-serif';ctx.textAlign='right';outlined(KT('건너뛰기: Esc → 나가기','건너뛰기: ❚❚ → 나가기'),x+w-10,y+17,'#8a7d66',3);ctx.restore()};
+// title button
+(function(){const b=document.getElementById('tutBtn');if(!b)return;b.addEventListener('click',()=>{rkEl('rkSubmit').hidden=true;rkEl('rkPanel').hidden=true;startTutorial()});
+  let seen=0;try{seen=+localStorage.getItem('ash_tut')}catch(e){}if(!seen)b.classList.add('new');
+  document.getElementById('pQuit').addEventListener('click',()=>{tut=null})})();
 </script>
 
 </body></html>
