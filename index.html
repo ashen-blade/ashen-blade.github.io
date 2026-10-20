@@ -1352,6 +1352,7 @@ setInterval(padSee,120);
 const SB_URL='https://lhsnlwnqwfnqaidobclh.supabase.co',SB_KEY='sb_publishable_h9AeRqUN0EAkcwpFVjvAaw_r8IN7NSp';
 const RKH={apikey:SB_KEY,'Content-Type':'application/json'};
 const rkEl=id=>document.getElementById(id);
+const OFFSITE=!/github\.io$/.test(location.hostname);
 let rkTab=1,rkStage=1,rkMine=[],rkPending=null;
 const STG_NM=['전체 클리어','1장 잿빛 성채','2장 혈월 고성'];
 function fmtT(s){return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')}
@@ -1364,7 +1365,7 @@ async function rkShow(diff,stage){if(stage==null)stage=rkStage;rkTab=diff;rkStag
     rows.forEach((r,i)=>{const li=document.createElement('li');if(rkMine.includes(r.id))li.className='me';
       const cells=[['n',i+1],['nm',r.name],['t',fmtT(r.time_sec)],['c',r.max_combo+' 콤보'],['r',r.rank]];
       for(const [c,v] of cells){const s=document.createElement('span');s.className=c;s.textContent=v;li.appendChild(s)}L.appendChild(li)})}
-  catch(e){if(rkTab+'/'+rkStage===key)L.innerHTML='<li class="empty">랭킹을 불러오지 못했어요. 인터넷 연결을 확인해 주세요.</li>'}}
+  catch(e){if(rkTab+'/'+rkStage===key)L.innerHTML=OFFSITE?'<li class="empty">랭킹은 ashen-blade.github.io 에서만 볼 수 있어요.</li>':'<li class="empty">랭킹을 불러오지 못했어요. 인터넷 연결을 확인해 주세요.</li>'}}
 function rkOpen(diff,stage){rkEl('rkPanel').hidden=false;rkShow(diff==null?diffI:diff,stage)}
 function rkOffer(recs){rkPending=recs;rkMine=[];const box=rkEl('rkSubmit'),inp=rkEl('rkName'),btn=rkEl('rkSend');box.hidden=false;btn.disabled=false;rkEl('rkMsg').textContent='등록될 기록: '+recs.map(r=>STG_NM[r.stage]+' '+fmtT(r.time_sec)).join(' · ');
   try{inp.value=localStorage.getItem('ash_name')||''}catch(e){}inp.focus();setTimeout(()=>{if(!box.hidden)inp.focus()},80)}
@@ -1375,7 +1376,7 @@ async function rkSubmit(){const inp=rkEl('rkName'),btn=rkEl('rkSend'),msg=rkEl('
   try{const r=await fetch(`${SB_URL}/rest/v1/scores`,{method:'POST',headers:Object.assign({Prefer:'return=representation'},RKH),body:JSON.stringify(rkPending.map(x=>Object.assign({name},x)))});
     if(!r.ok)throw new Error('HTTP '+r.status);const j=await r.json();rkMine=(j||[]).map(x=>x.id);
     const d=rkPending[0].diff,st=rkPending.some(x=>x.stage===0)?0:Math.max(...rkPending.map(x=>x.stage));rkPending=null;rkEl('rkSubmit').hidden=true;rkOpen(d,st)}
-  catch(e){btn.disabled=false;msg.textContent='등록에 실패했어요. 잠시 후 다시 눌러 주세요.'}}
+  catch(e){btn.disabled=false;msg.textContent=OFFSITE?'여기선 랭킹이 안 돼요! ashen-blade.github.io 에서 플레이해 주세요.':'등록에 실패했어요. 잠시 후 다시 눌러 주세요.'}}
 rkEl('rkSend').addEventListener('click',rkSubmit);
 rkEl('rkName').addEventListener('keydown',e=>{e.stopPropagation();if(e.key==='Enter'&&!e.isComposing&&e.keyCode!==229){e.preventDefault();setTimeout(rkSubmit,30)}});
 rkEl('rkName').addEventListener('keyup',e=>e.stopPropagation());
