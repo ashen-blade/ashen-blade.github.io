@@ -491,7 +491,7 @@ function loadRoom(i){roomI=i;room=ROOMS[i];mons=[];shots=[];fxs=[];boss=null;gat
   for(const [t,x] of room.spawn)spawnEnemy(t,x);buildBg();roomBanner=2.2;if(room.boss){bossIntro=2.4;sfx('bossin')}}
 let roomBanner=0,bossIntro=0;
 let splits=[],chStart=0,startCh=1;
-const PB={atk:1,crit:0,hp:0,def:1,mpr:1,cdr:1,emul:1};
+const PB={atk:1,crit:0,hp:0,def:1,mpr:1,cdr:1,emul:1,boss:1,combo:1,kheal:0,ult:1};
 function startGame(){if(typeof track==='function')track('start');auInit();player=newPlayer();runTime=0;splits=[];chStart=0;maxCombo=0;dmgTaken=0;combo.n=0;nums=[];imgs=[];loadRoom(0);state='play';ov.hidden=true;fade=1;fadeDir=-1}
 
 // ---------- hit system ----------
@@ -501,7 +501,7 @@ function overlaps(att,h,tg){const [x0,x1]=hitbox(att,h);if(tg.x+(tg.T?tg.T.w/2:1
 function canHit(e){return e.st!=='dead'&&e.st!=='getup'&&!e.spawnIn}
 function applyHit(tg,h,att,opt){
   opt=opt||{};if(tg.st==='down'&&!h.otg&&!opt.ult)return false;
-  const crit=Math.random()<0.13+PB.crit;let d=rnd(h.dmg[0],h.dmg[1])*(crit?1.5:1)*(tg.groggy>0?1.35:1)*PB.atk;d=Math.round(d);
+  const crit=Math.random()<0.13+PB.crit;let d=rnd(h.dmg[0],h.dmg[1])*(crit?1.5:1)*(tg.groggy>0?1.35:1)*PB.atk*(tg.type==='boss'?PB.boss:1)*(combo.n>=10?PB.combo:1)*(opt.ult?PB.ult:1);d=Math.round(d);
   tg.hp-=d;tg.hitF=0.09;tg.shk=0.12;
   const f=att?att.face:1,heavy=tg.armor>0&&tg.groggy<=0;
   if(heavy){tg.armor-=d;if(tg.armor<=0){tg.armor=0;tg.groggy=3.2;tg.atk=null;tg.st='groggy';tg.t=0;addNum(tg.x,tg.y,tg.z+tg.T.h+30,'GROGGY',3);sfx('boom');shake=Math.max(shake,14);flash=0.12;flashCol='255,220,140'}}
@@ -1815,26 +1815,40 @@ const INAME={w:['녹슨 철검','강철 대검','혈룬 대검','창백한 잿�
 const ICONI={w:0,a:4,c:8};const INV_MAX=60;
 const icStyle=i=>`background-position:${(i%4)*100/3}% ${Math.floor(i/4)*100/3}%`;
 const icHTML=(i,cls)=>`<i class="itic ${cls||''}" style="${icStyle(i)}"></i>`;
-function newItem(s,g){return{u:SAVE.uid++,s,g,lv:0,r:+(0.85+Math.random()*0.3).toFixed(3)}}
-function iStats(it){const g=it.g,L=it.lv,r=it.r,o={};
-  if(it.s==='w'){o.atk=[8,16,26,40][g]*r*(1+.1*L);o.crit=[0,2,4,7][g]*(1+.1*L)}
-  else if(it.s==='a'){o.hp=[200,450,800,1300][g]*r*(1+.1*L);o.def=[0,4,8,12][g]*(1+.05*L)}
-  else{o.mpr=[12,20,28,40][g]*r*(1+.1*L);o.cdr=[0,4,8,12][g]*(1+.05*L)}return o}
-const SNAME={atk:['공격력','%'],crit:['치명타','%'],hp:['체력','',1],def:['받는 피해 감소','%'],mpr:['MP 회복','%'],cdr:['쿨타임 감소','%']};
-function statLines(o){return Object.entries(o).filter(([k,v])=>v>0.05).map(([k,v])=>`${SNAME[k][0]} +${SNAME[k][2]?Math.round(v):v.toFixed(1)}${SNAME[k][1]}`)}
-function power(o){return Math.round((o.atk||0)*30+(o.crit||0)*25+(o.hp||0)*0.12+(o.def||0)*35+(o.mpr||0)*8+(o.cdr||0)*30)}
+SAVE.cry=SAVE.cry||0;
+// random bonus options: [key, label, min, max, unit]
+const OPTS=[['atk','공격력',3,8,'%'],['crit','치명타',2,5,'%'],['hpp','최대 체력',3,8,'%'],['def','받는 피해 감소',2,5,'%'],['mpr','MP 회복',5,15,'%'],['cdr','쿨타임 감소',2,5,'%'],
+  ['boss','보스에게 주는 피해',5,15,'%'],['combo','10콤보 이상일 때 피해',5,12,'%'],['kheal','적 처치 시 체력 회복',1,3,'%'],['ult','각성기 피해',10,25,'%']];
+const OPTM=Object.fromEntries(OPTS.map(o=>[o[0],o]));
+function rollOpts(g,il){const n=[0,1,2,3][g],pool=OPTS.slice(),out=[],sc=1+0.02*(il-1);for(let k=0;k<n&&pool.length;k++){const o=pool.splice(Math.floor(Math.random()*pool.length),1)[0];out.push([o[0],+((o[2]+Math.random()*(o[3]-o[2]))*sc).toFixed(1)])}return out}
+function newItem(s,g,il){il=Math.max(1,il||1);return{u:SAVE.uid++,s,g,lv:0,il,r:+(0.85+Math.random()*0.3).toFixed(3),op:rollOpts(g,il)}}
+// item level scales the main stat hard, the side stat softly; enhancement adds 10% per step
+function iStats(it){const g=it.g,L=it.lv,r=it.r,il=it.il||1,M=(1+.08*(il-1))*(1+.1*L),m=(1+.02*(il-1))*(1+.05*L),o={};
+  if(it.s==='w'){o.atk=[8,16,26,40][g]*r*M;o.crit=[0,2,4,7][g]*m}
+  else if(it.s==='a'){o.hp=[200,450,800,1300][g]*r*M;o.def=[0,4,8,12][g]*m}
+  else{o.mpr=[12,20,28,40][g]*r*M;o.cdr=[0,4,8,12][g]*m}
+  for(const [k,v] of it.op||[])o[k]=(o[k]||0)+v;return o}
+const SNAME={atk:['공격력','%'],crit:['치명타','%'],hp:['체력','',1],def:['받는 피해 감소','%'],mpr:['MP 회복','%'],cdr:['쿨타임 감소','%'],hpp:['최대 체력','%'],boss:['보스에게 주는 피해','%'],combo:['10콤보 이상 피해','%'],kheal:['처치 시 체력 회복','%'],ult:['각성기 피해','%']};
+const fmtS=(k,v)=>`${SNAME[k][0]} +${SNAME[k][2]?Math.round(v):v.toFixed(1)}${SNAME[k][1]}`;
+function statLines(o){return Object.entries(o).filter(([k,v])=>v>0.05).map(([k,v])=>fmtS(k,v))}
+function baseLines(it){const o=iStats(Object.assign({},it,{op:[]}));return statLines(o)}
+function power(o){return Math.round((o.atk||0)*30+(o.crit||0)*25+(o.hp||0)*0.12+(o.def||0)*35+(o.mpr||0)*8+(o.cdr||0)*30+(o.hpp||0)*30+(o.boss||0)*10+(o.combo||0)*12+(o.kheal||0)*40+(o.ult||0)*4)}
 const itemBy=u=>SAVE.inv.find(x=>x.u===u);
-function gearStats(){const t={atk:0,crit:0,hp:0,def:0,mpr:0,cdr:0};for(const s of ['w','a','c']){const it=itemBy(SAVE.eq[s]);if(it){const o=iStats(it);for(const k in o)t[k]+=o[k]}}return t}
+const ZS=()=>({atk:0,crit:0,hp:0,def:0,mpr:0,cdr:0,hpp:0,boss:0,combo:0,kheal:0,ult:0});
+function gearStats(){const t=ZS();for(const s of ['w','a','c']){const it=itemBy(SAVE.eq[s]);if(it){const o=iStats(it);for(const k in o)t[k]+=o[k]}}return t}
 const hasGear=()=>['w','a','c'].some(s=>itemBy(SAVE.eq[s]));
-function applyPB(on){const t=on?gearStats():{atk:0,crit:0,hp:0,def:0,mpr:0,cdr:0};PB.atk=1+t.atk/100;PB.crit=t.crit/100;PB.hp=Math.round(t.hp);PB.def=1-t.def/100;PB.mpr=1+t.mpr/100;PB.cdr=1-t.cdr/100}
-// starter kit
+function applyPB(on){const t=on?gearStats():ZS();PB.atk=1+t.atk/100;PB.crit=Math.min(.6,t.crit/100);PB.hp=Math.round((2400+t.hp)*(1+t.hpp/100)-2400);PB.def=Math.max(.35,1-t.def/100);PB.mpr=1+t.mpr/100;PB.cdr=Math.max(.55,1-t.cdr/100);
+  PB.boss=1+t.boss/100;PB.combo=1+t.combo/100;PB.kheal=t.kheal/100;PB.ult=1+t.ult/100}
+// old saves: give items an item level and options slot
+for(const it of SAVE.inv||[]){if(!it.il)it.il=1;if(!it.op)it.op=[]}
 if(!SAVE.inv){SAVE.inv=[newItem('w',0),newItem('a',0),newItem('c',0)];saveNow()}
-function addItem(it){if(SAVE.inv.length>=INV_MAX){const v=dismantleVal(it);SAVE.ash+=v.ash;SAVE.stone+=v.stone;return false}SAVE.inv.push(it);return true}
+function addItem(it){if(SAVE.inv.length>=INV_MAX){const v=dismantleVal(it);SAVE.ash+=v.ash;SAVE.stone+=v.stone;SAVE.cry+=v.cry;return false}SAVE.inv.push(it);return true}
 function rollGrade(f,minG){const L=Math.min(.12,.012*(f-1)),E=Math.min(.32,.05+.03*f),R=Math.min(.48,.25+.03*f),x=Math.random();let g=x<L?3:x<L+E?2:x<L+E+R?1:0;return Math.max(g,minG||0)}
-function rollItem(f,minG){const s=['w','a','c'][Math.floor(Math.random()*3)];return newItem(s,rollGrade(f,minG))}
-const enhCost=it=>({ash:Math.round(40*(it.lv+1)*(it.g+1)),stone:it.lv+1});
-const dismantleVal=it=>({ash:Math.round(20*(it.g+1)*(it.g+1)*(1+it.lv*0.3)),stone:it.g+Math.floor(it.lv/2)});
-
+function rollItem(f,minG){const s=['w','a','c'][Math.floor(Math.random()*3)];return newItem(s,rollGrade(f,minG),f)}
+const ENH_MAX=20;
+const enhCost=it=>it.lv<10?{ash:Math.round(40*(it.lv+1)*(it.g+1)),stone:it.lv+1,cry:0,rate:1}:{ash:Math.round(60*(it.lv+1)*(it.g+1)),stone:0,cry:it.lv-9,rate:Math.max(.4,.9-.05*(it.lv-10))};
+const canEnh=it=>{const c=enhCost(it);return it.lv<ENH_MAX&&SAVE.ash>=c.ash&&SAVE.stone>=c.stone&&SAVE.cry>=c.cry};
+const dismantleVal=it=>({ash:Math.round(20*(it.g+1)*(it.g+1)*(1+it.lv*0.3)*(1+0.03*((it.il||1)-1))),stone:it.g+Math.floor(Math.min(it.lv,10)/2),cry:(it.g>=3?1:0)+Math.max(0,it.lv-10)});
 // ---------- styles + markup ----------
 document.head.insertAdjacentHTML('beforeend',`<style>
 .itic{display:inline-block;background-image:url(${ITEM_ART});background-size:400% 400%;background-repeat:no-repeat;width:5cqh;height:5cqh;vertical-align:middle}
@@ -1856,8 +1870,8 @@ document.head.insertAdjacentHTML('beforeend',`<style>
 .cell{position:relative;aspect-ratio:1;background:#120e18;border:.35cqh solid;border-radius:1.4cqh;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
 .cell em{position:absolute;right:.6cqh;bottom:.3cqh;font-style:normal;font-size:2.3cqh;color:#fff;text-shadow:0 0 .6cqh #000}.cell .on{position:absolute;left:.6cqh;top:.4cqh;font-size:1.9cqh;background:#c9a04a;color:#1a1208;border-radius:.6cqh;padding:0 .8cqh}
 .det{grid-column:1/3;display:flex;gap:2cqh;align-items:center;background:#1e1828;border:1px solid #3a3048;border-radius:1.6cqh;padding:1.4cqh 2cqh;min-height:15cqh}
-.det .itic{width:12cqh;height:12cqh}.det .tx{flex:1;min-width:0}.det .tx b{display:block;font-weight:400;font-size:3.4cqh}.det .tx small{display:block;color:#cfc6dc;font-size:2.5cqh}
-.det .bt{display:flex;gap:1.2cqh;flex-wrap:wrap;justify-content:flex-end}.det button{border:0;border-radius:1.2cqh;padding:1.2cqh 2.6cqh;font-size:2.8cqh;color:#fff;background:#3a3048;white-space:nowrap}.det button.p{background:linear-gradient(#e8433a,#9a1420)}.det button.g{background:linear-gradient(#c9a04a,#7a5a1a);color:#1a1208}.det button:disabled{opacity:.4}
+.det .itic{width:12cqh;height:12cqh}.det .tx{flex:1;min-width:46cqh}.det .tx b{display:block;font-weight:400;font-size:3.4cqh}.det .tx small{display:block;color:#cfc6dc;font-size:2.5cqh}
+.det .bt{display:flex;gap:1.2cqh;flex:0 0 auto;align-items:stretch}.det button{border:0;border-radius:1.2cqh;padding:1cqh 2.2cqh;font-size:2.9cqh;color:#fff;background:#3a3048;white-space:nowrap;line-height:1.25}.det button small{display:block;font-size:2.1cqh;opacity:.85}.det button.p{background:linear-gradient(#e8433a,#9a1420)}.det button.g{background:linear-gradient(#c9a04a,#7a5a1a);color:#1a1208}.det button:disabled{opacity:.4}
 .det .hint{color:#8a7f9a;font-size:2.7cqh}
 #lootPop{position:absolute;left:50%;top:22cqh;transform:translateX(-50%);z-index:37;display:flex;align-items:center;gap:1.6cqh;background:rgba(16,12,24,.94);border:.3cqh solid;border-radius:1.6cqh;padding:1cqh 3cqh 1cqh 1.2cqh;pointer-events:none;animation:apop .35s cubic-bezier(.2,1.4,.4,1)}
 #lootPop .itic{width:8cqh;height:8cqh}#lootPop small{display:block;font-size:2.3cqh;color:#ffd27a}#lootPop b{font-weight:400;font-size:3.3cqh}
@@ -1874,7 +1888,7 @@ document.head.insertAdjacentHTML('beforeend',`<style>
 document.querySelectorAll('.itic[data-i]').forEach(e=>e.setAttribute('style',icStyle(+e.dataset.i)));
 const STG=document.querySelector('.stage');
 STG.insertAdjacentHTML('beforeend',`<div id="invOv" hidden><div class="ibox">
-<div class="ihead"><b>장비 · 가방</b><span class="sp"></span><span class="mat">${icHTML(12)}<b id="iAsh" style="font:inherit;color:#fff">0</b></span><span class="mat">${icHTML(13)}<b id="iStone" style="font:inherit;color:#fff">0</b></span><button type="button" class="xbtn" id="iClose">✕</button></div>
+<div class="ihead"><b>장비 · 가방</b><span class="sp"></span><span class="mat">${icHTML(12)}<b id="iAsh" style="font:inherit;color:#fff">0</b></span><span class="mat">${icHTML(13)}<b id="iStone" style="font:inherit;color:#fff">0</b></span><span class="mat">${icHTML(14)}<b id="iCry" style="font:inherit;color:#fff">0</b></span><button type="button" class="xbtn" id="iClose">✕</button></div>
 <div class="eqcol"><button type="button" class="slot" data-s="w"></button><button type="button" class="slot" data-s="a"></button><button type="button" class="slot" data-s="c"></button><div class="tot" id="iTot"></div>
 <label class="gtog"><input type="checkbox" id="iGear"> 모험에도 장비 효과 적용 (랭킹 등록 X)</label></div>
 <div class="bagcol"><div class="ftabs" id="iTabs"><button type="button" data-f="">전체</button><button type="button" data-f="w">무기</button><button type="button" data-f="a">갑옷</button><button type="button" data-f="c">장신구</button><span id="iCnt"></span></div><div class="grid" id="iGrid"></div></div>
@@ -1888,26 +1902,32 @@ STG.insertAdjacentHTML('beforeend',`<div id="invOv" hidden><div class="ibox">
 // ---------- inventory UI ----------
 let iFilter='',iSel=null;
 function openInv(f){iFilter=f||'';iSel=null;$('iGear').checked=!!SAVE.useGear;paintInv();$('invOv').hidden=false}
-function paintInv(){$('iAsh').textContent=Math.floor(SAVE.ash).toLocaleString();$('iStone').textContent=SAVE.stone;
+function paintInv(){$('iAsh').textContent=Math.floor(SAVE.ash).toLocaleString();$('iStone').textContent=SAVE.stone;$('iCry').textContent=SAVE.cry;
   document.querySelectorAll('.eqcol .slot').forEach(b=>{const s=b.dataset.s,it=itemBy(SAVE.eq[s]);b.className='slot'+(it?'':' empty')+(iSel&&it&&iSel===it.u?' sel':'');b.style.borderColor=it?GCOL[it.g]:'';
-    b.innerHTML=(it?icHTML(ICONI[s]+it.g):icHTML(ICONI[s],'')).replace('class="itic ','class="itic '+(it?'':'ghost')+' ')+`<div class="tx"><small>${SLOTN[s]}</small><b style="color:${it?GCOL[it.g]:''}">${it?INAME[s][it.g]+(it.lv?' +'+it.lv:''):'비어 있음'}</b></div>`;
+    b.innerHTML=(it?icHTML(ICONI[s]+it.g):icHTML(ICONI[s],'')).replace('class="itic ','class="itic '+(it?'':'ghost')+' ')+`<div class="tx"><small>${SLOTN[s]}</small><b style="color:${it?GCOL[it.g]:''}">${it?INAME[s][it.g]+(it.lv?' +'+it.lv:'')+' · Lv'+it.il:'비어 있음'}</b></div>`;
     if(!it)b.querySelector('.itic').style.opacity=.18});
   const t=gearStats(),ln=statLines(t);$('iTot').innerHTML=`<b>전투력 ${power(t).toLocaleString()}</b>${ln.length?ln.join('<br>'):'장비를 장착하면 능력치가 올라가요'}`;
   document.querySelectorAll('#iTabs button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.f===iFilter?'true':'false'));
-  const eqd=new Set(Object.values(SAVE.eq));const list=SAVE.inv.filter(x=>!iFilter||x.s===iFilter).sort((a,b)=>(eqd.has(b.u)-eqd.has(a.u))||b.g-a.g||b.lv-a.lv||a.s.localeCompare(b.s));
+  const eqd=new Set(Object.values(SAVE.eq));const list=SAVE.inv.filter(x=>!iFilter||x.s===iFilter).sort((a,b)=>(eqd.has(b.u)-eqd.has(a.u))||power(iStats(b))-power(iStats(a)));
   $('iCnt').textContent=`${SAVE.inv.length} / ${INV_MAX}`;const G=$('iGrid');G.innerHTML='';
   for(const it of list){const c=document.createElement('button');c.type='button';c.className='cell'+(iSel===it.u?' sel':'');c.style.borderColor=GCOL[it.g];c.style.background=`radial-gradient(circle at 50% 40%,${GCOL[it.g]}33,#120e18 70%)`;
-    c.innerHTML=icHTML(ICONI[it.s]+it.g)+(it.lv?`<em>+${it.lv}</em>`:'')+(eqd.has(it.u)?'<span class="on">장착</span>':'');c.addEventListener('click',()=>{iSel=it.u;sfx('ui');paintInv()});G.appendChild(c)}
+    c.innerHTML=icHTML(ICONI[it.s]+it.g)+`<em>${it.lv?'+'+it.lv+' ':''}<small style="color:#b9a98a">Lv${it.il}</small></em>`+(eqd.has(it.u)?'<span class="on">장착</span>':'');c.addEventListener('click',()=>{iSel=it.u;sfx('ui');paintInv()});G.appendChild(c)}
   if(!list.length)G.innerHTML='<p style="color:#8a7f9a;grid-column:1/-1">아이템이 없어요. 아이템 던전에서 장비를 얻어 보세요!</p>';
   paintDet()}
 function paintDet(){const D=$('iDet'),it=iSel&&itemBy(iSel);if(!it){D.innerHTML='<span class="hint">아이템을 누르면 자세히 보고 장착·강화·분해할 수 있어요.</span>';return}
   const on=SAVE.eq[it.s]===it.u,o=iStats(it),cur=itemBy(SAVE.eq[it.s]),c=enhCost(it),dv=dismantleVal(it);
   let cmp='';if(!on&&cur){const d=power(o)-power(iStats(cur));cmp=` <span style="color:${d>=0?'#7dff9a':'#ff7a6a'}">(${d>=0?'▲':'▼'}${Math.abs(d)})</span>`}
-  D.innerHTML=`${icHTML(ICONI[it.s]+it.g)}<div class="tx"><b style="color:${GCOL[it.g]}">${INAME[it.s][it.g]}${it.lv?' +'+it.lv:''}</b><small>${GRADE[it.g]} ${SLOTN[it.s]} · 전투력 ${power(o)}${cmp}</small><small>${statLines(o).join(' · ')}</small></div>
-  <div class="bt"><button type="button" class="p" id="dEq">${on?'해제':'장착'}</button><button type="button" class="g" id="dEnh" ${it.lv>=10||SAVE.ash<c.ash||SAVE.stone<c.stone?'disabled':''}>${it.lv>=10?'최대 강화':`강화 +${it.lv+1} · 잿가루 ${c.ash} · 강화석 ${c.stone}`}</button><button type="button" id="dDis" ${on?'disabled':''}>분해 · 잿가루 +${dv.ash}${dv.stone?' · 강화석 +'+dv.stone:''}</button></div>`;
+  const ops=(it.op||[]).map(([k,v])=>`<span style="color:#7dd8ff">✦ ${fmtS(k,v)}</span>`).join(' ');
+  const cost=it.lv>=ENH_MAX?'최대 강화':`강화 +${it.lv+1}<small>잿가루 ${c.ash} · ${c.cry?'결정 '+c.cry:'강화석 '+c.stone}${c.rate<1?` · ${Math.round(c.rate*100)}%`:''}</small>`;
+  D.innerHTML=`${icHTML(ICONI[it.s]+it.g)}<div class="tx"><b style="color:${GCOL[it.g]}">${INAME[it.s][it.g]}${it.lv?' +'+it.lv:''} <small style="display:inline;color:#b9a98a">Lv${it.il}</small></b><small>${GRADE[it.g]} ${SLOTN[it.s]} · 전투력 ${power(o)}${cmp}</small><small>${baseLines(it).join(' · ')}</small>${ops?`<small>${ops}</small>`:''}</div>
+  <div class="bt"><button type="button" class="p" id="dEq">${on?'해제':'장착'}</button><button type="button" class="g" id="dEnh" ${canEnh(it)?'':'disabled'}>${cost}</button><button type="button" id="dDis" ${on?'disabled':''}>분해<small>+${dv.ash}${dv.stone?' · 석 '+dv.stone:''}${dv.cry?' · 결정 '+dv.cry:''}</small></button></div>`;
   $('dEq').onclick=()=>{SAVE.eq[it.s]=on?0:it.u;sfx(on?'ui':'shield');saveNow();paintInv()};
-  $('dEnh').onclick=()=>{if(it.lv>=10||SAVE.ash<c.ash||SAVE.stone<c.stone)return;SAVE.ash-=c.ash;SAVE.stone-=c.stone;it.lv++;sfx('evolve');saveNow();paintInv()};
-  $('dDis').onclick=e=>{if(on)return;if(it.g>=2&&!e.target.dataset.sure){e.target.dataset.sure=1;e.target.textContent=`${GRADE[it.g]} 아이템! 한 번 더 누르면 분해`;e.target.style.background='#9a1420';return}SAVE.ash+=dv.ash;SAVE.stone+=dv.stone;SAVE.inv=SAVE.inv.filter(x=>x!==it);iSel=null;sfx('kill');saveNow();paintInv()}}
+  $('dEnh').onclick=()=>{if(!canEnh(it))return;SAVE.ash-=c.ash;SAVE.stone-=c.stone;SAVE.cry-=c.cry;
+    if(Math.random()<c.rate){it.lv++;sfx('evolve');iMsg(`강화 성공! +${it.lv}`,'#7dff9a')}else{sfx('lose');iMsg('강화 실패… 재료만 사라졌어요','#ff7a6a')}saveNow();paintInv()};
+  $('dDis').onclick=e=>{if(on)return;if(it.g>=2&&!e.currentTarget.dataset.sure){const bt=e.currentTarget;bt.dataset.sure=1;bt.innerHTML=`정말 분해?<small>한 번 더 누르기</small>`;bt.style.background='#9a1420';return}
+    SAVE.ash+=dv.ash;SAVE.stone+=dv.stone;SAVE.cry+=dv.cry;SAVE.inv=SAVE.inv.filter(x=>x!==it);iSel=null;sfx('kill');saveNow();paintInv()}}
+function iMsg(t,c){document.querySelectorAll('.imsg').forEach(x=>x.remove());const m=document.createElement('div');m.className='imsg';m.textContent=t;m.style.cssText=`position:absolute;left:50%;top:44%;transform:translateX(-50%);z-index:5;background:rgba(10,8,18,.94);border:1px solid ${c};color:${c};border-radius:999px;padding:1.2cqh 4cqh;font-size:3.4cqh;pointer-events:none;animation:apop .3s`;
+  document.querySelector('.ibox').appendChild(m);setTimeout(()=>m.remove(),1300)}
 document.querySelectorAll('.eqcol .slot').forEach(b=>b.addEventListener('click',()=>{const it=itemBy(SAVE.eq[b.dataset.s]);if(it){iSel=it.u}else{iFilter=b.dataset.s;iSel=null}sfx('ui');paintInv()}));
 document.querySelectorAll('#iTabs button').forEach(b=>b.addEventListener('click',()=>{iFilter=b.dataset.f;paintInv()}));
 $('iGear').addEventListener('change',e=>{SAVE.useGear=e.target.checked;saveNow()});
@@ -1923,14 +1943,14 @@ function dgRooms(f){const n=5+Math.min(3,Math.floor(f/3)),pick=a=>a[Math.floor(M
   {w:1450,nm:`아이템 던전 ${f}층 · 잿빛 회랑`,dg:1,spawn:sp(1450,['grunt','grunt','spear','caster'])},
   {w:1500,nm:`아이템 던전 ${f}층 · 핏빛 지하`,dg:1,ch:2,spawn:sp(1500,['ghoul','ghoul','bknight','bpriest','bat'])},
   {w:1250,nm:`아이템 던전 ${f}층 · 수호자의 방`,dg:1,dgb:1,ch:vl?2:undefined,spawn:[[vl?'vlord':'boss',880],[vl?'bat':'grunt',600]]}]}
-function dgEnter(f){DG.on=true;DG.f=f;DG.loot=[];if(!DG.main)DG.main=ROOMS.slice();ROOMS.length=0;ROOMS.push(...dgRooms(f));startCh=0;$('dgOv').hidden=true;startGame()}
+function dgEnter(f){DG.on=true;DG.f=f;DG.loot=[];DG.cry=0;if(!DG.main)DG.main=ROOMS.slice();ROOMS.length=0;ROOMS.push(...dgRooms(f));startCh=0;$('dgOv').hidden=true;startGame()}
 function dgExit(){if(!DG.on)return;DG.on=false;ROOMS.length=0;ROOMS.push(...DG.main);DG.main=null;PB.emul=1;startCh=1}
 function openDg(){SAVE.dg.sel=Math.min(Math.max(1,SAVE.dg.sel||1),SAVE.dg.max+1);paintDg();$('dgOv').hidden=false}
 function paintDg(){const f=SAVE.dg.sel,m=dgMul(f);$('dFloor').textContent=f+'층';$('dPrev').disabled=f<=1;$('dNext').disabled=f>SAVE.dg.max;
   const pw=power(gearStats()),rec=Math.max(0,(f-1)*90);
   $('dInfo').innerHTML=`<div>수호자 <b>${f%2===0?'혈월의 군주 발라크':'철갑 오우거 고르둔'}</b></div><div>최고 기록 <b>${SAVE.dg.max?SAVE.dg.max+'층':'없음'}</b></div>
    <div>적 체력 <b>${Math.round(m.hp*100)}%</b> · 적 공격력 <b>${Math.round(m.em*100)}%</b></div><div>권장 전투력 <b>${rec}</b> · 내 전투력 <b style="color:${pw>=rec?'#7dff9a':'#ff7a6a'}">${pw}</b></div>
-   <div>보상 <b>장비 2~4개 · 강화석 · 잿가루</b></div><div>방 <b>3개</b> (회랑 → 지하 → 수호자)</div>`;
+   <div>보상 <b>Lv${f} 장비 2~4개 · 강화석${f>=5?' · 마력 결정':''}</b></div><div>방 <b>3개</b> (회랑 → 지하 → 수호자)</div>`;
   const L=Math.min(.12,.012*(f-1)),E=Math.min(.32,.05+.03*f),R=Math.min(.48,.25+.03*f);
   $('dOdds').innerHTML=[1-L-E-R,R,E,L].map((p,g)=>`<span style="border-color:${GCOL[g]};color:${GCOL[g]}">${GRADE[g]} ${Math.round(p*100)}%</span>`).join('')}
 $('bItem').addEventListener('click',openDg);
@@ -1945,10 +1965,11 @@ function nextLoot(){if(lootOn||!lootQ.length)return;lootOn=true;const [h,c]=loot
   setTimeout(()=>{P.hidden=true;lootOn=false;setTimeout(nextLoot,150)},1700)}
 function giveItem(it){const kept=addItem(it);DG.loot.push(it);lootPop(`${icHTML(ICONI[it.s]+it.g)}<div><small>${kept?'획득!':'가방이 가득 차서 자동 분해'}</small><b style="color:${GCOL[it.g]}">${INAME[it.s][it.g]} · ${GRADE[it.g]}</b></div>`,GCOL[it.g])}
 function giveStone(n){SAVE.stone+=n;DG.stones=(DG.stones||0)+n;lootPop(`${icHTML(13)}<div><small>획득!</small><b>강화석 ×${n}</b></div>`,'#e8433a')}
-function roomLoot(final){const f=DG.f;if(final){giveItem(rollItem(f,1));giveItem(rollItem(f));if(Math.random()<0.5)giveItem(rollItem(f));giveStone(2+Math.floor(f/2))}
+function giveCry(n){SAVE.cry+=n;DG.cry=(DG.cry||0)+n;lootPop(`${icHTML(14)}<div><small>획득!</small><b style="color:#7dd8ff">마력 결정 ×${n}</b></div>`,'#4a8aff')}
+function roomLoot(final){const f=DG.f;if(final){giveItem(rollItem(f,1));giveItem(rollItem(f));if(Math.random()<0.5)giveItem(rollItem(f));giveStone(2+Math.floor(f/2));if(f>=5)giveCry(1+Math.floor(f/10))}
   else{if(Math.random()<0.75)giveItem(rollItem(f));giveStone(1+Math.floor(Math.random()*(1+f/3)))}saveNow()}
 // hooks
-const _sgI=startGame;startGame=function(){if(DG.on){DG.loot=[];DG.stones=0;ROOMS.length=0;ROOMS.push(...dgRooms(DG.f));startCh=0}applyPB(DG.on||SAVE.useGear);PB.emul=DG.on?dgMul(DG.f).em:1;RUNGEAR=!DG.on&&SAVE.useGear&&hasGear();_sgI()};
+const _sgI=startGame;startGame=function(){if(DG.on){DG.loot=[];DG.stones=0;DG.cry=0;ROOMS.length=0;ROOMS.push(...dgRooms(DG.f));startCh=0}applyPB(DG.on||SAVE.useGear);PB.emul=DG.on?dgMul(DG.f).em:1;RUNGEAR=!DG.on&&SAVE.useGear&&hasGear();_sgI()};
 let RUNGEAR=false;
 const _stI=startTutorial;startTutorial=function(){dgExit();applyPB(false);_stI()};
 const _lrI=loadRoom;loadRoom=function(i){_lrI(i);if(DG.on&&room&&room.dg){const m=dgMul(DG.f);for(const e of mons){const k=e.type==='boss'?m.bhp:m.hp;e.max=e.hp=Math.round(e.max*k);if(e.armorMax){e.armorMax=e.armor=Math.round(e.armorMax*Math.min(1,k*1.6))}}if(room.dgb){roomBanner=2.2;bossIntro=2.4;sfx('bossin')}}};
@@ -1957,7 +1978,7 @@ const _msI=musicSync2;musicSync2=function(){if(DG.on&&room&&room.dgb&&(state==='
 const _srI=showResult;showResult=function(win){if(DG.on&&win){runAsh+=(60+40*DG.f);SAVE.dg.max=Math.max(SAVE.dg.max,DG.f);SAVE.dg.sel=Math.min(DG.f+1,SAVE.dg.max+1)}{const g=$('gearNote');if(g)g.remove()}_srI(win);
   if(DG.on){ovText.textContent=win?`${DG.f}층 수호자를 쓰러뜨렸다! ${DG.f+1}층이 열렸어요.`:`${DG.f}층에서 쓰러졌다… 그래도 얻은 전리품은 가방에 들어갔어요.`;
     const lr=document.createElement('div');lr.className='lootrow';lr.id='lootRow';
-    lr.innerHTML=DG.loot.map(it=>`<span class="cell" style="border-color:${GCOL[it.g]}">${icHTML(ICONI[it.s]+it.g)}</span>`).join('')+(DG.stones?`<span class="cell" style="border-color:#e8433a">${icHTML(13)}<em>×${DG.stones}</em></span>`:'');
+    lr.innerHTML=DG.loot.map(it=>`<span class="cell" style="border-color:${GCOL[it.g]}">${icHTML(ICONI[it.s]+it.g)}</span>`).join('')+(DG.stones?`<span class="cell" style="border-color:#e8433a">${icHTML(13)}<em>×${DG.stones}</em></span>`:'')+(DG.cry?`<span class="cell" style="border-color:#4a8aff">${icHTML(14)}<em>×${DG.cry}</em></span>`:'');
     const old=$('lootRow');if(old)old.remove();ovStats.after(lr);ovBtn.textContent=win?'다음 층 ▶':'다시 입장';if(win){DG.f=SAVE.dg.sel}}
   else{const old=$('lootRow');if(old)old.remove();if(RUNGEAR){rkEl('rkSubmit').hidden=true;const n=document.createElement('p');n.id='gearNote';n.className='diffd';n.style.color='#ffb07a';n.textContent='⚔ 장비 효과를 켜고 한 기록이라 랭킹 등록은 안 돼요. (장비 창에서 끄고 도전하면 기록돼요)';ovStats.after(n)}}
   saveNow()};
@@ -1970,6 +1991,8 @@ paintHome();
 document.querySelector('.aDiff').insertAdjacentHTML('beforeend','<label class="gearchk"><input type="checkbox" id="aGear"> 장비 효과 적용 <small>— 켜면 더 강해지지만 랭킹 등록은 안 돼요</small></label>');
 $('aGear').addEventListener('change',e=>{SAVE.useGear=e.target.checked;saveNow()});
 const _paI=paintAdv;paintAdv=function(){_paI();$('aGear').checked=!!SAVE.useGear};
+
+const _kIt=kill;kill=function(e){const was=e.deadPending;_kIt(e);if(!was&&PB.kheal>0&&player&&player.hp>0&&!e.T.dummy){player.hp=Math.min(player.max,player.hp+player.max*PB.kheal)}};
 </script>
 
 </body></html>
