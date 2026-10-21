@@ -2050,7 +2050,8 @@ function applyPB(on){const t=on?gearStats():ZS();PB.atk=1+t.atk/100;PB.crit=Math
 for(const it of SAVE.inv||[]){if(!it.il)it.il=1;if(!it.op)it.op=[]}
 if(!SAVE.inv){SAVE.inv=[newItem('w',0),newItem('a',0),newItem('c',0)];saveNow()}
 function addItem(it){if(SAVE.inv.length>=INV_MAX){const v=dismantleVal(it);SAVE.ash+=v.ash;SAVE.stone+=v.stone;SAVE.cry+=v.cry;return false}SAVE.inv.push(it);return true}
-function rollGrade(f,minG){const L=Math.min(.12,.012*(f-1)),E=Math.min(.32,.05+.03*f),R=Math.min(.48,.25+.03*f),x=Math.random();let g=x<L?3:x<L+E?2:x<L+E+R?1:0;return Math.max(g,minG||0)}
+const GOD=f=>{const L=Math.min(.05,.004*Math.max(0,f-2)),E=Math.min(.18,.02+.012*f),R=Math.min(.38,.18+.02*f);return [1-L-E-R,R,E,L]};
+function rollGrade(f,minG){const L=GOD(f)[3],E=GOD(f)[2],R=GOD(f)[1],x=Math.random();let g=x<L?3:x<L+E?2:x<L+E+R?1:0;return Math.max(g,minG||0)}
 function rollItem(f,minG){const s=['w','a','c'][Math.floor(Math.random()*3)];return newItem(s,rollGrade(f,minG),f)}
 const ENH_MAX=20;
 const enhCost=it=>it.lv<10?{ash:Math.round(40*(it.lv+1)*(it.g+1)),stone:it.lv+1,cry:0,rate:1}:{ash:Math.round(60*(it.lv+1)*(it.g+1)),stone:0,cry:it.lv-9,rate:Math.max(.4,.9-.05*(it.lv-10))};
@@ -2157,8 +2158,8 @@ function paintDg(){const f=SAVE.dg.sel,m=dgMul(f);$('dFloor').textContent=f+'층
   const pw=power(gearStats()),rec=Math.max(0,(f-1)*90);
   $('dInfo').innerHTML=`<div>수호자 <b>${CHAPTERS[(f-1)%CHAPTERS.length].bossNm}</b></div><div>최고 기록 <b>${SAVE.dg.max?SAVE.dg.max+'층':'없음'}</b></div>
    <div>적 체력 <b>${Math.round(m.hp*100)}%</b> · 적 공격력 <b>${Math.round(m.em*100)}%</b></div><div>권장 전투력 <b>${rec}</b> · 내 전투력 <b style="color:${pw>=rec?'#7dff9a':'#ff7a6a'}">${pw}</b></div>
-   <div>보상 <b>Lv${f} 장비 2~4개 · 강화석${f>=5?' · 마력 결정':''}</b></div><div>방 <b>3개</b> (일반 → 일반 → 수호자)</div>`;
-  const L=Math.min(.12,.012*(f-1)),E=Math.min(.32,.05+.03*f),R=Math.min(.48,.25+.03*f);
+   <div>보상 <b>Lv${f} 장비 1~4개 · 강화석${f>=5?' · 마력 결정':''}</b></div><div>방 <b>3개</b> (일반 → 일반 → 수호자)</div>`;
+  const L=GOD(f)[3],E=GOD(f)[2],R=GOD(f)[1];
   $('dOdds').innerHTML=[1-L-E-R,R,E,L].map((p,g)=>`<span style="border-color:${GCOL[g]};color:${GCOL[g]}">${GRADE[g]} ${Math.round(p*100)}%</span>`).join('')}
 $('bItem').addEventListener('click',openDg);
 $('dClose').addEventListener('click',()=>$('dgOv').hidden=true);
@@ -2173,8 +2174,8 @@ function nextLoot(){if(lootOn||!lootQ.length)return;lootOn=true;const [h,c]=loot
 function giveItem(it){const kept=addItem(it);DG.loot.push(it);lootPop(`${icHTML(ICONI[it.s]+it.g)}<div><small>${kept?'획득!':'가방이 가득 차서 자동 분해'}</small><b style="color:${GCOL[it.g]}">${INAME[it.s][it.g]} · ${GRADE[it.g]}</b></div>`,GCOL[it.g])}
 function giveStone(n){SAVE.stone+=n;DG.stones=(DG.stones||0)+n;lootPop(`${icHTML(13)}<div><small>획득!</small><b>강화석 ×${n}</b></div>`,'#e8433a')}
 function giveCry(n){SAVE.cry+=n;DG.cry=(DG.cry||0)+n;lootPop(`${icHTML(14)}<div><small>획득!</small><b style="color:#7dd8ff">마력 결정 ×${n}</b></div>`,'#4a8aff')}
-function roomLoot(final){const f=DG.f;if(final){giveItem(rollItem(f,1));giveItem(rollItem(f));if(Math.random()<0.5)giveItem(rollItem(f));giveStone(2+Math.floor(f/2));if(f>=5)giveCry(1+Math.floor(f/10))}
-  else{if(Math.random()<0.75)giveItem(rollItem(f));giveStone(1+Math.floor(Math.random()*(1+f/3)))}saveNow()}
+function roomLoot(final){const f=DG.f;if(final){giveItem(rollItem(f,Math.random()<0.5?1:0));if(Math.random()<0.35)giveItem(rollItem(f));giveStone(2+Math.floor(f/2));if(f>=5)giveCry(1+Math.floor(f/10))}
+  else{if(Math.random()<0.4)giveItem(rollItem(f));giveStone(1+Math.floor(Math.random()*(1+f/3)))}saveNow()}
 // hooks
 const _sgI=startGame;startGame=function(){if(DG.on){DG.loot=[];DG.stones=0;DG.cry=0;ROOMS.length=0;ROOMS.push(...dgRooms(DG.f));startCh=0}applyPB(DG.on||SAVE.useGear);PB.emul=DG.on?dgMul(DG.f).em:1;RUNGEAR=!DG.on&&SAVE.useGear&&hasGear();RUNPOW=RUNGEAR?power(gearStats()):0;_sgI()};
 let RUNGEAR=false,RUNPOW=0;
