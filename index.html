@@ -73,7 +73,7 @@ html.land header,html.land .foot,html.rot header,html.rot .foot{display:none}
 #rkList .n{font-family:"Black Han Sans",sans-serif;color:#ffd27a;text-align:center}#rkList .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #rkList .t{color:#fff}#rkList .c{color:#9ad0ff;font-size:12px}#rkList .r{font-family:"Black Han Sans",sans-serif;color:#ff7a4a}
 #rkList .empty{display:block;text-align:center;color:#9a90ab;border:0}
-.rktabs.st button{border-color:#c9a04a55}
+.rktabs.st button{border-color:#c9a04a55}.rktabs.gr button{font-size:14px;padding:8px}.rktabs.gr small{display:block;font-size:10px;opacity:.75}.rktabs.gr button[aria-selected="true"]{background:linear-gradient(#e8433a,#9a1420);color:#fff;border-color:#e8433a}#rkList .pw{color:#c06aff;font-size:12px}
 .rknote{margin:8px 0 0;font-size:12px;color:#9a90ab;text-align:center}
 #ov{overflow:auto;justify-content:safe center}
 #pauseBtn{position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:6;width:40px;height:34px;border-radius:10px;background:rgba(10,8,18,.6);color:#fff;border:1px solid #4a3e5c;font-size:14px;letter-spacing:-2px}
@@ -237,6 +237,7 @@ html.menu .touch{display:none!important}
 <div class="ovrow"><button type="button" id="ovHome">⌂ 홈으로</button><button id="ovBtn">다시 도전</button><button type="button" id="rkOpen">🏆 랭킹 보기</button></div>
 </div>
 <div id="rkPanel" hidden><div class="rkbox"><div class="rkhead"><b>명예의 전당</b><button type="button" id="rkClose" aria-label="닫기">✕</button></div>
+<div class="rktabs gr" role="tablist"><button type="button" data-gr="0">⚔ 실력 랭킹 <small>장비 없이</small></button><button type="button" data-gr="1">💎 장비 랭킹 <small>장비 착용</small></button></div>
 <div class="rktabs st" role="tablist"><button type="button" data-st="1">1장</button><button type="button" data-st="2">2장</button><button type="button" data-st="0">전체 클리어</button></div>
 <div class="rktabs" role="tablist"><button type="button" data-rk="0">초급자</button><button type="button" data-rk="1">중급자</button><button type="button" data-rk="2">고급자</button><button type="button" data-rk="3">마스터</button></div>
 <ol id="rkList"></ol><p class="rknote">클리어 시간이 빠른 순 · 같으면 콤보가 높은 순</p></div></div>
@@ -1325,7 +1326,7 @@ function showResult(win){const t=Math.floor(runTime),dmul=[0.7,1,1.25,1.5][diffI
   ovTitle.innerHTML=win?(RUNALL?'전체 <span class="red">클리어</span>':room&&room.ch===2?'2장 <span class="red">클리어</span>':'1장 <span class="red">클리어</span>'):'쓰러졌다';ovText.textContent=win?(room&&room.ch===2?(RUNALL?'잿빛 성채부터 혈월 고성까지, 모든 밤을 끝냈다!':'혈월의 군주 발라크를 쓰러뜨리고 고성의 밤을 끝냈다.'):'철갑 오우거 고르둔을 쓰러뜨리고 잿빛 성채를 되찾았다.'):'다시 도전해보자. 대쉬(L)로 공격을 뚫고 지나가고, 스킬을 이어서 써봐.';
   document.querySelectorAll('#ov .keys').forEach(e=>e.hidden=true);ovStats.hidden=false;ovStats.innerHTML=`<div><b>${rank}</b><span>랭크 · ${DF().nm}</span></div><div><b>${Math.floor(t/60)}:${String(t%60).padStart(2,'0')}</b><span>클리어 시간</span></div><div><b>${maxCombo}</b><span>최대 콤보</span></div><div><b>${dmgTaken.toLocaleString()}</b><span>받은 피해</span></div>`;
   ovBtn.textContent='다시 도전';ov.hidden=false;if(win&&room&&room.ch===2&&!room.dg&&typeof track==='function')track('clear');const sp=splits.slice();if(win)sp.push(Math.floor(runTime-chStart));const recs=sp.map((v,i)=>({stage:i+startCh,time_sec:v})).filter(r=>r.time_sec>=30);if(win&&startCh===1&&RUNALL)recs.push({stage:0,time_sec:t});
-  if(recs.length&&typeof rankOffer==='function')rankOffer(recs.map(r=>Object.assign({diff:diffI,max_combo:maxCombo,dmg_taken:Math.round(dmgTaken),rank:win?rank:'B'},r)));else{const s=document.getElementById('rkSubmit');if(s)s.hidden=true;ovBtn.focus()}}
+  if(recs.length&&typeof rankOffer==='function')rankOffer(recs.map(r=>Object.assign({diff:diffI,max_combo:maxCombo,dmg_taken:Math.round(dmgTaken),rank:win?rank:'B',gear:typeof RUNGEAR!=='undefined'&&!!RUNGEAR,power:typeof RUNGEAR!=='undefined'&&RUNGEAR?Math.min(9999999,RUNPOW||0):0},r)));else{const s=document.getElementById('rkSubmit');if(s)s.hidden=true;ovBtn.focus()}}
 ovBtn.addEventListener('click',startGame);
 // title backdrop
 roomI=0;room=ROOMS[0];buildBg();player=null;
@@ -1400,20 +1401,20 @@ const SB_URL='https://lhsnlwnqwfnqaidobclh.supabase.co',SB_KEY='sb_publishable_h
 const RKH={apikey:SB_KEY,'Content-Type':'application/json'};
 const rkEl=id=>document.getElementById(id);
 const OFFSITE=!/github\.io$/.test(location.hostname);
-let rkTab=1,rkStage=1,rkMine=[],rkPending=null;
+let rkTab=1,rkStage=1,rkGear=0,rkMine=[],rkPending=null;
 const STG_NM=['전체 클리어','1장 잿빛 성채','2장 혈월 고성'];
 function fmtT(s){return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')}
-async function rkFetch(diff,stage){const q=`${SB_URL}/rest/v1/scores?select=id,name,time_sec,max_combo,rank&diff=eq.${diff}&stage=eq.${stage}&order=time_sec.asc,max_combo.desc,created_at.asc&limit=10`;
+async function rkFetch(diff,stage,gear){const q=`${SB_URL}/rest/v1/scores?select=id,name,time_sec,max_combo,rank,power&diff=eq.${diff}&stage=eq.${stage}&gear=eq.${gear?'true':'false'}&order=time_sec.asc,max_combo.desc,created_at.asc&limit=10`;
   const r=await fetch(q,{headers:RKH});if(!r.ok)throw new Error('HTTP '+r.status);return r.json()}
-async function rkShow(diff,stage){if(stage==null)stage=rkStage;rkTab=diff;rkStage=stage;const key=diff+'/'+stage;document.querySelectorAll('[data-rk]').forEach(b=>b.setAttribute('aria-selected',+b.dataset.rk===diff?'true':'false'));document.querySelectorAll('[data-st]').forEach(b=>b.setAttribute('aria-selected',+b.dataset.st===stage?'true':'false'));
+async function rkShow(diff,stage,gear){if(stage==null)stage=rkStage;if(gear==null)gear=rkGear;rkTab=diff;rkStage=stage;rkGear=gear;const key=diff+'/'+stage+'/'+gear;document.querySelectorAll('[data-gr]').forEach(b=>b.setAttribute('aria-selected',+b.dataset.gr===gear?'true':'false'));document.querySelectorAll('[data-rk]').forEach(b=>b.setAttribute('aria-selected',+b.dataset.rk===diff?'true':'false'));document.querySelectorAll('[data-st]').forEach(b=>b.setAttribute('aria-selected',+b.dataset.st===stage?'true':'false'));
   const L=rkEl('rkList');L.innerHTML='<li class="empty">불러오는 중…</li>';
-  try{const rows=await rkFetch(diff,stage);if(rkTab+'/'+rkStage!==key)return;L.innerHTML='';
+  try{const rows=await rkFetch(diff,stage,gear);if(rkTab+'/'+rkStage+'/'+rkGear!==key)return;L.innerHTML='';
     if(!rows.length){L.innerHTML='<li class="empty">아직 기록이 없어요. 첫 번째 클리어의 주인공이 되어보세요!</li>';return}
     rows.forEach((r,i)=>{const li=document.createElement('li');if(rkMine.includes(r.id))li.className='me';
-      const cells=[['n',i+1],['nm',r.name],['t',fmtT(r.time_sec)],['c',r.max_combo+' 콤보'],['r',r.rank]];
+      const cells=[['n',i+1],['nm',r.name],['t',fmtT(r.time_sec)],gear?['pw','전투력 '+(r.power||0).toLocaleString()]:['c',r.max_combo+' 콤보'],['r',r.rank]];
       for(const [c,v] of cells){const s=document.createElement('span');s.className=c;s.textContent=v;li.appendChild(s)}L.appendChild(li)})}
-  catch(e){if(rkTab+'/'+rkStage===key)L.innerHTML=OFFSITE?'<li class="empty">랭킹은 ashen-blade.github.io 에서만 볼 수 있어요.</li>':'<li class="empty">랭킹을 불러오지 못했어요. 인터넷 연결을 확인해 주세요.</li>'}}
-function rkOpen(diff,stage){rkEl('rkPanel').hidden=false;rkShow(diff==null?diffI:diff,stage)}
+  catch(e){if(rkTab+'/'+rkStage+'/'+rkGear===key)L.innerHTML=OFFSITE?'<li class="empty">랭킹은 ashen-blade.github.io 에서만 볼 수 있어요.</li>':'<li class="empty">랭킹을 불러오지 못했어요. 인터넷 연결을 확인해 주세요.</li>'}}
+function rkOpen(diff,stage,gear){rkEl('rkPanel').hidden=false;rkShow(diff==null?diffI:diff,stage,gear==null?rkGear:gear)}
 function rkOffer(recs){rkPending=recs;rkMine=[];const box=rkEl('rkSubmit'),inp=rkEl('rkName'),btn=rkEl('rkSend');box.hidden=false;btn.disabled=false;rkEl('rkMsg').textContent='등록될 기록: '+recs.map(r=>STG_NM[r.stage]+' '+fmtT(r.time_sec)).join(' · ');
   try{inp.value=localStorage.getItem('ash_name')||''}catch(e){}inp.focus();setTimeout(()=>{if(!box.hidden)inp.focus()},80)}
 const rankOffer=rkOffer;
@@ -1422,7 +1423,7 @@ async function rkSubmit(){const inp=rkEl('rkName'),btn=rkEl('rkSend'),msg=rkEl('
   btn.disabled=true;msg.textContent='등록 중…';try{localStorage.setItem('ash_name',name)}catch(e){}
   try{const r=await fetch(`${SB_URL}/rest/v1/scores`,{method:'POST',headers:Object.assign({Prefer:'return=representation'},RKH),body:JSON.stringify(rkPending.map(x=>Object.assign({name},x)))});
     if(!r.ok)throw new Error('HTTP '+r.status);const j=await r.json();rkMine=(j||[]).map(x=>x.id);
-    const d=rkPending[0].diff,st=rkPending.some(x=>x.stage===0)?0:Math.max(...rkPending.map(x=>x.stage));rkPending=null;rkEl('rkSubmit').hidden=true;rkOpen(d,st)}
+    const d=rkPending[0].diff,gr=rkPending[0].gear?1:0,st=rkPending.some(x=>x.stage===0)?0:Math.max(...rkPending.map(x=>x.stage));rkPending=null;rkEl('rkSubmit').hidden=true;rkOpen(d,st,gr)}
   catch(e){btn.disabled=false;msg.textContent=OFFSITE?'여기선 랭킹이 안 돼요! ashen-blade.github.io 에서 플레이해 주세요.':'등록에 실패했어요. 잠시 후 다시 눌러 주세요.'}}
 rkEl('rkSend').addEventListener('click',rkSubmit);
 rkEl('rkName').addEventListener('keydown',e=>{e.stopPropagation();if(e.key==='Enter'&&!e.isComposing&&e.keyCode!==229){e.preventDefault();setTimeout(rkSubmit,30)}});
@@ -1431,6 +1432,7 @@ rkEl('rkOpen').addEventListener('click',()=>rkOpen());
 rkEl('rkClose').addEventListener('click',()=>{rkEl('rkPanel').hidden=true;ovBtn.focus()});
 document.querySelectorAll('[data-rk]').forEach(b=>b.addEventListener('click',()=>rkShow(+b.dataset.rk)));
 document.querySelectorAll('[data-st]').forEach(b=>b.addEventListener('click',()=>rkShow(rkTab,+b.dataset.st)));
+document.querySelectorAll('[data-gr]').forEach(b=>b.addEventListener('click',()=>rkShow(rkTab,rkStage,+b.dataset.gr)));
 // hide submit box whenever a new run starts
 ovBtn.addEventListener('click',()=>{rkEl('rkSubmit').hidden=true;rkEl('rkPanel').hidden=true;rkPending=null});
 
@@ -1681,7 +1683,7 @@ $('hArt').addEventListener('click',()=>{const b=$('hBubble');b.querySelector('sp
 function toast(t){const e=$('hToast');e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,1500)}
 $('bAdv').addEventListener('click',()=>showScr('adv'));
 
-$('bRank').addEventListener('click',()=>rkOpen(diffI,SAVE.ch===2?2:1));
+$('bRank').addEventListener('click',()=>rkOpen(diffI,SAVE.ch===3?0:SAVE.ch===2?2:1));
 // banner
 let bnI=0,bnN=0;
 function buildBanner(){const T=$('bTrack');if(T.dataset.ok)return;T.dataset.ok=1;
@@ -1690,7 +1692,7 @@ function buildBanner(){const T=$('bTrack');if(T.dataset.ok)return;T.dataset.ok=1
     {i:'랭킹',b:'명예의 전당',s:'불러오는 중…',bg:IMG.bg2,go:()=>rkOpen(diffI,0),rk:1}];
   bnN=S.length;S.forEach((x,k)=>{const d=document.createElement('div');d.className='bSlide';d.style.backgroundImage=`url(${x.bg.src})`;d.innerHTML=`<i>${x.i}</i><b></b><small></small>`;
     d.querySelector('b').textContent=x.b;d.querySelector('small').textContent=x.s;d.addEventListener('click',()=>{sfx('ui');x.go()});T.appendChild(d);$('bDots').appendChild(document.createElement('span'));
-    if(x.rk)rkFetch(diffI,0).then(r=>{d.querySelector('small').textContent=r&&r[0]?`${DIFFS[diffI].nm} 1위 · ${r[0].name} · ${fmtT(r[0].time_sec)}`:'첫 번째 전체 클리어의 주인공이 되어보세요!'}).catch(()=>{d.querySelector('small').textContent='전체 클리어 기록을 확인해 보세요'})});
+    if(x.rk)rkFetch(diffI,0,0).then(r=>{d.querySelector('small').textContent=r&&r[0]?`${DIFFS[diffI].nm} 1위 · ${r[0].name} · ${fmtT(r[0].time_sec)}`:'첫 번째 전체 클리어의 주인공이 되어보세요!'}).catch(()=>{d.querySelector('small').textContent='전체 클리어 기록을 확인해 보세요'})});
   bnGo(0);setInterval(()=>{if(curScr==='home')bnGo(bnI+1)},4500)}
 function bnGo(k){bnI=(k+bnN)%bnN;$('bTrack').style.transform=`translateX(${-100*bnI}%)`;[...$('bDots').children].forEach((d,i)=>d.classList.toggle('on',i===bnI))}
 
@@ -1917,7 +1919,7 @@ const STG=document.querySelector('.stage');
 STG.insertAdjacentHTML('beforeend',`<div id="invOv" hidden><div class="ibox">
 <div class="ihead"><b>장비 · 가방</b><span class="sp"></span><span class="mat">${icHTML(12)}<b id="iAsh" style="font:inherit;color:#fff">0</b></span><span class="mat">${icHTML(13)}<b id="iStone" style="font:inherit;color:#fff">0</b></span><span class="mat">${icHTML(14)}<b id="iCry" style="font:inherit;color:#fff">0</b></span><button type="button" class="xbtn" id="iClose">✕</button></div>
 <div class="eqcol"><button type="button" class="slot" data-s="w"></button><button type="button" class="slot" data-s="a"></button><button type="button" class="slot" data-s="c"></button><div class="tot" id="iTot"></div>
-<label class="gtog"><input type="checkbox" id="iGear"> 모험에도 장비 효과 적용 (랭킹 등록 X)</label></div>
+<label class="gtog"><input type="checkbox" id="iGear"> 모험에도 장비 효과 적용 (켜면 장비 랭킹)</label></div>
 <div class="bagcol"><div class="ftabs" id="iTabs"><button type="button" data-f="">전체</button><button type="button" data-f="w">무기</button><button type="button" data-f="a">갑옷</button><button type="button" data-f="c">장신구</button><span id="iCnt"></span></div><div class="grid" id="iGrid"></div></div>
 <div class="det" id="iDet"></div></div></div>
 <div id="dgOv" hidden><div class="dbox"><button type="button" class="xbtn" id="dClose">✕</button><b>아이템 던전</b>
@@ -1996,8 +1998,8 @@ function giveCry(n){SAVE.cry+=n;DG.cry=(DG.cry||0)+n;lootPop(`${icHTML(14)}<div>
 function roomLoot(final){const f=DG.f;if(final){giveItem(rollItem(f,1));giveItem(rollItem(f));if(Math.random()<0.5)giveItem(rollItem(f));giveStone(2+Math.floor(f/2));if(f>=5)giveCry(1+Math.floor(f/10))}
   else{if(Math.random()<0.75)giveItem(rollItem(f));giveStone(1+Math.floor(Math.random()*(1+f/3)))}saveNow()}
 // hooks
-const _sgI=startGame;startGame=function(){if(DG.on){DG.loot=[];DG.stones=0;DG.cry=0;ROOMS.length=0;ROOMS.push(...dgRooms(DG.f));startCh=0}applyPB(DG.on||SAVE.useGear);PB.emul=DG.on?dgMul(DG.f).em:1;RUNGEAR=!DG.on&&SAVE.useGear&&hasGear();_sgI()};
-let RUNGEAR=false;
+const _sgI=startGame;startGame=function(){if(DG.on){DG.loot=[];DG.stones=0;DG.cry=0;ROOMS.length=0;ROOMS.push(...dgRooms(DG.f));startCh=0}applyPB(DG.on||SAVE.useGear);PB.emul=DG.on?dgMul(DG.f).em:1;RUNGEAR=!DG.on&&SAVE.useGear&&hasGear();RUNPOW=RUNGEAR?power(gearStats()):0;_sgI()};
+let RUNGEAR=false,RUNPOW=0;
 const _stI=startTutorial;startTutorial=function(){dgExit();applyPB(false);_stI()};
 const _lrI=loadRoom;loadRoom=function(i){_lrI(i);if(DG.on&&room&&room.dg){const m=dgMul(DG.f);for(const e of mons){const k=e.type==='boss'?m.bhp:m.hp;e.max=e.hp=Math.round(e.max*k);if(e.armorMax){e.armorMax=e.armor=Math.round(e.armorMax*Math.min(1,k*1.6))}}if(room.dgb){roomBanner=2.2;bossIntro=2.4;sfx('bossin')}}};
 const _wuI=worldUpdate;worldUpdate=function(dt){const g0=gateOpen,s0=state;_wuI(dt);if(!DG.on)return;if(!g0&&gateOpen)roomLoot(false);if(s0==='play'&&state==='clear')roomLoot(true)};
@@ -2007,7 +2009,7 @@ const _srI=showResult;showResult=function(win){if(DG.on&&win){runAsh+=(60+40*DG.
     const lr=document.createElement('div');lr.className='lootrow';lr.id='lootRow';
     lr.innerHTML=DG.loot.map(it=>`<span class="cell" style="border-color:${GCOL[it.g]}">${icHTML(ICONI[it.s]+it.g)}</span>`).join('')+(DG.stones?`<span class="cell" style="border-color:#e8433a">${icHTML(13)}<em>×${DG.stones}</em></span>`:'')+(DG.cry?`<span class="cell" style="border-color:#4a8aff">${icHTML(14)}<em>×${DG.cry}</em></span>`:'');
     const old=$('lootRow');if(old)old.remove();ovStats.after(lr);ovBtn.textContent=win?'다음 층 ▶':'다시 입장';if(win){DG.f=SAVE.dg.sel}}
-  else{const old=$('lootRow');if(old)old.remove();if(RUNGEAR){rkEl('rkSubmit').hidden=true;const n=document.createElement('p');n.id='gearNote';n.className='diffd';n.style.color='#ffb07a';n.textContent='⚔ 장비 효과를 켜고 한 기록이라 랭킹 등록은 안 돼요. (장비 창에서 끄고 도전하면 기록돼요)';ovStats.after(n)}}
+  else{const old=$('lootRow');if(old)old.remove();if(RUNGEAR&&!rkEl('rkSubmit').hidden){const n=document.createElement('p');n.id='gearNote';n.className='diffd';n.style.color='#c06aff';n.textContent=`💎 장비를 낀 기록이라 장비 랭킹에 올라가요 (전투력 ${RUNPOW.toLocaleString()})`;ovStats.after(n)}}
   saveNow()};
 for(const id of ['ovHome','pQuit'])$(id).addEventListener('click',()=>{dgExit();const old=$('lootRow');if(old)old.remove()});
 // keep the adventure path clean of dungeon state
@@ -2015,7 +2017,7 @@ const _goA=goAdv;goAdv=function(){dgExit();_goA()};$('aGo').removeEventListener(
 paintHome();
 
 // adventure screen: gear toggle right under the difficulty picker
-document.querySelector('.aDiff').insertAdjacentHTML('beforeend','<label class="gearchk"><input type="checkbox" id="aGear"> 장비 효과 적용 <small>— 켜면 더 강해지지만 랭킹 등록은 안 돼요</small></label>');
+document.querySelector('.aDiff').insertAdjacentHTML('beforeend','<label class="gearchk"><input type="checkbox" id="aGear"> 장비 효과 적용 <small>— 켜면 💎장비 랭킹, 끄면 ⚔실력 랭킹에 기록돼요</small></label>');
 $('aGear').addEventListener('change',e=>{SAVE.useGear=e.target.checked;saveNow()});
 const _paI=paintAdv;paintAdv=function(){_paI();$('aGear').checked=!!SAVE.useGear};
 
