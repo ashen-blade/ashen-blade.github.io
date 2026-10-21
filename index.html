@@ -154,12 +154,12 @@ html.land #mutef,html.rot #mutef{display:block}
 #hToast{position:absolute;left:50%;top:14%;transform:translateX(-50%);background:rgba(10,8,18,.92);border:1px solid #c9a04a;border-radius:999px;padding:1.4cqh 4cqh;font-size:3.2cqh;color:#ffe3a8;z-index:5;animation:pop .2s}
 .back{position:absolute;left:3cqh;top:3.5cqh;z-index:2;background:rgba(16,12,24,.85);border:1px solid rgba(201,160,74,.6);color:#ffe3a8;border-radius:999px;padding:1cqh 3.4cqh;font-size:3.4cqh}
 .aTitle{position:absolute;left:0;right:0;top:3cqh;margin:0;text-align:center;font-family:"Black Han Sans",sans-serif;font-weight:400;font-size:6.4cqh;color:#f3e3bf;text-shadow:0 .5cqh 0 #3a0a10}
-.chs{position:absolute;left:0;right:0;top:15cqh;display:flex;justify-content:center;gap:4cqh}
-.ch{position:relative;width:66cqh;height:44cqh;border-radius:2cqh;overflow:hidden;border:.4cqh solid #4a3e5c;background:#120e18;padding:0;color:#fff;text-align:left;cursor:pointer;transition:transform .15s,border-color .15s;box-shadow:0 1.4cqh 4cqh rgba(0,0,0,.6)}
+.chs{position:absolute;left:0;right:0;top:15cqh;display:flex;justify-content:center;gap:3cqh}
+.ch{position:relative;width:52cqh;height:42cqh;border-radius:2cqh;overflow:hidden;border:.4cqh solid #4a3e5c;background:#120e18;padding:0;color:#fff;text-align:left;cursor:pointer;transition:transform .15s,border-color .15s;box-shadow:0 1.4cqh 4cqh rgba(0,0,0,.6)}
 .ch[aria-pressed="true"]{border-color:#ffd27a;box-shadow:0 0 4cqh rgba(255,210,122,.45),0 1.4cqh 4cqh rgba(0,0,0,.6);transform:translateY(-1cqh)}
 .chImg{position:absolute;inset:0;background-size:cover;background-position:center}.ch::after{content:'';position:absolute;inset:0;background:linear-gradient(transparent 35%,rgba(6,4,10,.95))}
-.ch b{position:absolute;left:3cqh;bottom:8cqh;z-index:1;font-family:"Black Han Sans",sans-serif;font-weight:400;font-size:5cqh;text-shadow:0 .4cqh 0 #000}
-.ch span{position:absolute;left:3cqh;right:3cqh;bottom:3cqh;z-index:1;font-size:2.7cqh;color:#d8cfe4}
+.ch b{position:absolute;left:3cqh;bottom:10.5cqh;z-index:1;font-family:"Black Han Sans",sans-serif;font-weight:400;font-size:5cqh;text-shadow:0 .4cqh 0 #000}
+.ch span{position:absolute;left:3cqh;right:3cqh;bottom:2.6cqh;z-index:1;font-size:2.4cqh;line-height:1.35;color:#d8cfe4}
 .chB{position:absolute;right:2cqh;top:2cqh;z-index:1;font-style:normal;font-size:2.6cqh;background:rgba(10,8,18,.85);border:1px solid #c9a04a;color:#ffd27a;border-radius:999px;padding:.3cqh 1.6cqh}.chB:empty{display:none}
 .lock{position:absolute;inset:0;z-index:2;display:none;align-items:center;justify-content:center;background:rgba(6,4,10,.72);font-size:3.6cqh;color:#cfc6dc}.ch.locked .lock{display:flex}.ch.locked{cursor:not-allowed}
 .aDiff{position:absolute;left:0;right:0;top:64cqh;display:flex;flex-direction:column;align-items:center;gap:1.6cqh}
@@ -215,7 +215,8 @@ html.menu .touch{display:none!important}
 <div id="hToast" hidden></div></div>
 <div id="scrAdv" class="scr" hidden><div class="hBg bgimg dim"></div><button type="button" class="back" id="aBack">‹ 홈</button><h3 class="aTitle">모험</h3>
 <div class="chs"><button type="button" class="ch" data-ch="1"><i class="chImg" data-bg="bg"></i><b>1장 · 잿빛 성채</b><span>산적과 철갑 오우거 고르둔이 점거한 무너진 성채</span><em class="chB"></em></button>
-<button type="button" class="ch" data-ch="2"><i class="chImg" data-bg="bg2"></i><b>2장 · 혈월 고성</b><span>혈월의 군주 발라크가 잠든 흡혈귀의 고성</span><em class="chB"></em><div class="lock">🔒 1장을 클리어하면 열려요</div></button></div>
+<button type="button" class="ch" data-ch="2"><i class="chImg" data-bg="bg2"></i><b>2장 · 혈월 고성</b><span>혈월의 군주 발라크가 잠든 흡혈귀의 고성</span><em class="chB"></em><div class="lock">🔒 1장을 클리어하면 열려요</div></button>
+<button type="button" class="ch" data-ch="3"><i class="chImg" data-bg="lobby"></i><b>전체 도전</b><span>1장 → 2장을 쉬지 않고 연속으로. 전체 클리어 랭킹 도전!</span><em class="chB"></em><div class="lock">🔒 1장을 클리어하면 열려요</div></button></div>
 <div class="aDiff"><div class="diff" role="group" aria-label="난이도"><button type="button" data-diff="0">초급자</button><button type="button" data-diff="1">중급자</button><button type="button" data-diff="2">고급자</button><button type="button" data-diff="3">마스터</button></div>
 <p id="diffDesc" class="diffd"></p>
 </div><button type="button" id="aGo">출발 ▶</button></div>
@@ -490,7 +491,7 @@ function spawnEnemy(type,x){const T=ETYPE[type],D=DF();const e={type,T,x,y:rnd(D
 function loadRoom(i){roomI=i;room=ROOMS[i];mons=[];shots=[];fxs=[];boss=null;gateOpen=false;player.x=110;player.y=DEPTH*0.55;player.z=0;player.st='idle';player.move=null;camX=0;
   for(const [t,x] of room.spawn)spawnEnemy(t,x);buildBg();roomBanner=2.2;if(room.boss){bossIntro=2.4;sfx('bossin')}}
 let roomBanner=0,bossIntro=0;
-let splits=[],chStart=0,startCh=1;
+let splits=[],chStart=0,startCh=1,RUNALL=false;
 const PB={atk:1,crit:0,hp:0,def:1,mpr:1,cdr:1,emul:1,boss:1,combo:1,kheal:0,ult:1};
 function startGame(){if(typeof track==='function')track('start');auInit();player=newPlayer();runTime=0;splits=[];chStart=0;maxCombo=0;dmgTaken=0;combo.n=0;nums=[];imgs=[];loadRoom(0);state='play';ov.hidden=true;fade=1;fadeDir=-1}
 
@@ -1295,9 +1296,9 @@ function frame(now){let dt=Math.min(0.05,(now-last)/1000);last=now;time+=dt;
   requestAnimationFrame(frame)}
 function musicSync2(){if(!AU.ctx)return;setSong(state==='play'||state==='clear'?(room&&room.boss?(room.ch===2?'dragon':'boss'):(room&&room.ch===2?'night':'dusk')):'')}
 function showResult(win){const t=Math.floor(runTime),dmul=[0.7,1,1.25,1.5][diffI],score=(win?4000:0)+maxCombo*60-dmgTaken*0.6-t*8;const sc2=score*dmul;const rank=!win?'F':sc2>5200?'SSS':sc2>4400?'SS':sc2>3600?'S':sc2>2600?'A':'B';
-  ovTitle.innerHTML=win?'던전 <span class="red">클리어</span>':'쓰러졌다';ovText.textContent=win?'혈월의 군주 발라크를 쓰러뜨리고 고성의 밤을 끝냈다.':'다시 도전해보자. 대쉬(L)로 공격을 뚫고 지나가고, 스킬을 이어서 써봐.';
+  ovTitle.innerHTML=win?(RUNALL?'전체 <span class="red">클리어</span>':room&&room.ch===2?'2장 <span class="red">클리어</span>':'1장 <span class="red">클리어</span>'):'쓰러졌다';ovText.textContent=win?(room&&room.ch===2?(RUNALL?'잿빛 성채부터 혈월 고성까지, 모든 밤을 끝냈다!':'혈월의 군주 발라크를 쓰러뜨리고 고성의 밤을 끝냈다.'):'철갑 오우거 고르둔을 쓰러뜨리고 잿빛 성채를 되찾았다.'):'다시 도전해보자. 대쉬(L)로 공격을 뚫고 지나가고, 스킬을 이어서 써봐.';
   document.querySelectorAll('#ov .keys').forEach(e=>e.hidden=true);ovStats.hidden=false;ovStats.innerHTML=`<div><b>${rank}</b><span>랭크 · ${DF().nm}</span></div><div><b>${Math.floor(t/60)}:${String(t%60).padStart(2,'0')}</b><span>클리어 시간</span></div><div><b>${maxCombo}</b><span>최대 콤보</span></div><div><b>${dmgTaken.toLocaleString()}</b><span>받은 피해</span></div>`;
-  ovBtn.textContent='다시 도전';ov.hidden=false;if(win&&typeof track==='function')track('clear');const sp=splits.slice();if(win)sp.push(Math.floor(runTime-chStart));const recs=sp.map((v,i)=>({stage:i+startCh,time_sec:v})).filter(r=>r.time_sec>=30);if(win&&startCh===1)recs.push({stage:0,time_sec:t});
+  ovBtn.textContent='다시 도전';ov.hidden=false;if(win&&room&&room.ch===2&&!room.dg&&typeof track==='function')track('clear');const sp=splits.slice();if(win)sp.push(Math.floor(runTime-chStart));const recs=sp.map((v,i)=>({stage:i+startCh,time_sec:v})).filter(r=>r.time_sec>=30);if(win&&startCh===1&&RUNALL)recs.push({stage:0,time_sec:t});
   if(recs.length&&typeof rankOffer==='function')rankOffer(recs.map(r=>Object.assign({diff:diffI,max_combo:maxCombo,dmg_taken:Math.round(dmgTaken),rank:win?rank:'B'},r)));else{const s=document.getElementById('rkSubmit');if(s)s.hidden=true;ovBtn.focus()}}
 ovBtn.addEventListener('click',startGame);
 // title backdrop
@@ -1629,7 +1630,7 @@ document.querySelectorAll('.kart').forEach(a=>a.src=TITLE_ART);$('hArt').src=KAE
 document.querySelectorAll('.lobby').forEach(e=>e.style.backgroundImage=`url(${LOBBY_ART})`);
 (function art(){let ok=true;const bg=IMG.bg,bg2=IMG.bg2;
   if(bg)document.querySelectorAll('.bgimg').forEach(e=>{if(!e.style.backgroundImage)e.style.backgroundImage=`url(${bg.src})`});else ok=false;
-  document.querySelectorAll('.chImg').forEach(e=>{const im=IMG[e.dataset.bg];if(im){if(!e.style.backgroundImage)e.style.backgroundImage=`url(${im.src})`}else ok=false});
+  document.querySelectorAll('.chImg').forEach(e=>{const im=e.dataset.bg==='lobby'?{src:LOBBY_ART}:IMG[e.dataset.bg];if(im){if(!e.style.backgroundImage)e.style.backgroundImage=`url(${im.src})`}else ok=false});
   if(IMG.portrait)$('hPort').src=IMG.portrait.src;else ok=false;
   if(!ok)setTimeout(art,200);else buildBanner()})();
 
@@ -1640,7 +1641,7 @@ addEventListener('keydown',e=>{
   if(curScr==='title'&&!e.repeat){e.preventDefault();leaveTitle();return}
   if(curScr==='home'&&(e.code==='Enter'||e.code==='Space')&&!e.repeat&&$('setOv').hidden&&$('rkPanel').hidden){e.preventDefault();sfx('ui');showScr('adv')}
   else if(curScr==='adv'&&$('rkPanel').hidden){if(e.code==='Escape'){showScr('home')}else if((e.code==='Enter'||e.code==='Space')&&!e.repeat){e.preventDefault();goAdv()}
-    else if(e.code==='KeyA'||e.code==='ArrowLeft')pickCh(1);else if(e.code==='KeyD'||e.code==='ArrowRight')pickCh(2)}},true);
+    else if(e.code==='KeyA'||e.code==='ArrowLeft')pickCh(Math.max(1,(SAVE.ch||1)-1));else if(e.code==='KeyD'||e.code==='ArrowRight')pickCh(Math.min(3,(SAVE.ch||1)+1))}},true);
 
 // ---------- home ----------
 const lvOf=xp=>Math.floor(Math.sqrt(xp/60))+1;
@@ -1668,25 +1669,25 @@ function buildBanner(){const T=$('bTrack');if(T.dataset.ok)return;T.dataset.ok=1
 function bnGo(k){bnI=(k+bnN)%bnN;$('bTrack').style.transform=`translateX(${-100*bnI}%)`;[...$('bDots').children].forEach((d,i)=>d.classList.toggle('on',i===bnI))}
 
 // ---------- adventure ----------
-function pickCh(c){if(c===2&&!SAVE.prog.c1){sfx('ui');toast2();return}SAVE.ch=c;saveNow();paintAdv()}
-function toast2(){const L=document.querySelector('.ch[data-ch="2"] .lock');L.animate([{transform:'translateX(0)'},{transform:'translateX(-1.5cqh)'},{transform:'translateX(1.5cqh)'},{transform:'translateX(0)'}],{duration:260})}
-function paintAdv(){if(SAVE.ch===2&&!SAVE.prog.c1)SAVE.ch=1;
-  document.querySelectorAll('.ch').forEach(b=>{const c=+b.dataset.ch;b.setAttribute('aria-pressed',c===SAVE.ch?'true':'false');b.classList.toggle('locked',c===2&&!SAVE.prog.c1);b.querySelector('.chB').textContent=SAVE.prog['c'+c]?'✔ 클리어':''})}
+function pickCh(c){if(c>=2&&!SAVE.prog.c1){sfx('ui');toast2(c);return}SAVE.ch=c;saveNow();paintAdv()}
+function toast2(c){const L=document.querySelector(`.ch[data-ch="${c||2}"] .lock`);L.animate([{transform:'translateX(0)'},{transform:'translateX(-1.5cqh)'},{transform:'translateX(1.5cqh)'},{transform:'translateX(0)'}],{duration:260})}
+function paintAdv(){if(SAVE.ch>=2&&!SAVE.prog.c1)SAVE.ch=1;
+  document.querySelectorAll('.ch').forEach(b=>{const c=+b.dataset.ch;b.setAttribute('aria-pressed',c===SAVE.ch?'true':'false');b.classList.toggle('locked',c>=2&&!SAVE.prog.c1);b.querySelector('.chB').textContent=SAVE.prog[c===3?'all':'c'+c]?'✔ 클리어':''})}
 document.querySelectorAll('.ch').forEach(b=>b.addEventListener('click',()=>pickCh(+b.dataset.ch)));
 $('aBack').addEventListener('click',()=>showScr('home'));
-function goAdv(){startCh=SAVE.ch||1;hideScr();startGame()}
+function goAdv(){const c=SAVE.ch||1;startCh=c===3?1:c;RUNALL=c===3;hideScr();startGame()}
 $('aGo').addEventListener('click',goAdv);
 ovBtn.removeEventListener('click',_startGame0);ovBtn.addEventListener('click',()=>startGame());
 // start the chosen chapter
 const _startGameH=startGame;startGame=function(){hideScr();runAsh=0;_startGameH();if(startCh===2){const i=ROOMS.findIndex(r=>r.ch===2);loadRoom(i)}};
-const _startTutH=startTutorial;startTutorial=function(){startCh=1;hideScr();_startTutH()};
+const _startTutH=startTutorial;startTutorial=function(){startCh=1;RUNALL=false;hideScr();_startTutH()};
 
 // ---------- rewards & progress ----------
 let runAsh=0;
 const _killH=kill;kill=function(e){const was=e.deadPending;_killH(e);if(!was&&!e.T.dummy&&!(typeof tut!=='undefined'&&tut)){const m=[1,1.3,1.6,2][diffI];runAsh+=(e.type==='boss'?150:4)*m}};
 function bank(){if(runAsh>0){SAVE.ash+=runAsh;SAVE.xp+=runAsh;runAsh=0;saveNow()}}
 const _loadRoomH=loadRoom;loadRoom=function(i){const prev=room;if(prev&&prev.boss&&state==='play'&&!(typeof tut!=='undefined'&&tut)){SAVE.prog['c'+(prev.ch||1)]=1;saveNow()}_loadRoomH(i)};
-const _showResultH=showResult;showResult=function(win){if(win&&room&&!room.dg)SAVE.prog['c'+(room.ch||1)]=1;const got=Math.round(runAsh+(win?100*[1,1.3,1.6,2][diffI]:0));runAsh=got;bank();_showResultH(win);
+const _showResultH=showResult;showResult=function(win){if(win&&room&&!room.dg){SAVE.prog['c'+(room.ch||1)]=1;if(RUNALL)SAVE.prog.all=1}const got=Math.round(runAsh+(win?100*[1,1.3,1.6,2][diffI]:0));runAsh=got;bank();_showResultH(win);
   ovStats.insertAdjacentHTML('beforeend',`<div><b>+${got}</b><span>잿가루</span></div>`);ovBtn.textContent='다시 도전'};
 $('ovHome').addEventListener('click',()=>{sfx('ui');state='title';player=null;mons=[];shots=[];boss=null;showScr('home')});
 $('pQuit').addEventListener('click',()=>{bank();showScr('home')});
@@ -1786,7 +1787,7 @@ const _kA=kill;kill=function(e){const was=e.deadPending;_kA(e);if(was||e.T.dummy
   if(e.type==='boss'){const vl=e.T.kind==='vlord';ach(vl?'vlad':'gord');if(dmgTaken===RUN.bossDmg)ach(vl?'vladNH':'gordNH');if(player&&player.hp>0&&player.hp<=player.max*0.1)ach('clutch')}
   if(ST.kills%10===0||ST.kills===100||ST.kills===500){saveNow();achCheck()}};
 const _srA=showResult;showResult=function(win){_srA(win);if(!win)ST.deaths++;else{ST.clears++;
-    if(startCh===1){ach('d'+diffI);if(runTime<=480)ach('fast');if(RUN.ult===0)ach('noult')}
+    if(startCh===1&&RUNALL){ach('d'+diffI);if(runTime<=480)ach('fast');if(RUN.ult===0)ach('noult')}
     const rk=ovStats.querySelector('b');if(rk&&rk.textContent==='SSS')ach('sss')}
   saveNow();achCheck()};
 // drain-grab escape + tutorial completion
@@ -1993,6 +1994,10 @@ $('aGear').addEventListener('change',e=>{SAVE.useGear=e.target.checked;saveNow()
 const _paI=paintAdv;paintAdv=function(){_paI();$('aGear').checked=!!SAVE.useGear};
 
 const _kIt=kill;kill=function(e){const was=e.deadPending;_kIt(e);if(!was&&PB.kheal>0&&player&&player.hp>0&&!e.T.dummy){player.hp=Math.min(player.max,player.hp+player.max*PB.kheal)}};
+
+// ---------- single-chapter runs end at that chapter's boss ----------
+const _wuM=worldUpdate;worldUpdate=function(dt){const g0=gateOpen;_wuM(dt);
+  if(!g0&&gateOpen&&!RUNALL&&!DG.on&&state==='play'&&room&&room.boss&&!(typeof tut!=='undefined'&&tut)){gateOpen=false;nums=nums.filter(n=>!/다음 방으로/.test(String(n.v!=null?n.v:n.txt!=null?n.txt:n.t)));state='clear';sfx('win');setTimeout(()=>showResult(true),1600)}};
 </script>
 
 </body></html>
