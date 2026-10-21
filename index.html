@@ -1180,6 +1180,32 @@ function drawLordAura(e,sx,sy){ctx.save();ctx.globalCompositeOperation='lighter'
 
 // ---------- 2nd-chapter extras ----------
 function priestHeal(s){if(s.col==='blood'&&s.src&&s.src.hp>0){const v=Math.round(s.src.max*0.15);s.src.hp=Math.min(s.src.max,s.src.hp+v);addNum(s.src.x,s.src.y,s.src.T.h+30,'+'+v,0)}}
+// ===================== longer chapters: elite mid-bosses + wave rooms =====================
+Object.assign(ETYPE,{
+  chief:{nm:'산적 두목 · 붉은 송곳',hp:9000,spd:115,w:44,h:128,look:'spear',base:'spear',cut:'chief',elite:1,armor:1500,
+    atk:{range:175,wind:.5,dur:.95,hit:{off:10,w:178,dmg:[170,210],stun:.5,kx:320}},cd:[.8,1.4]},
+  bcapt:{nm:'혈기사 대장 · 진홍의 창',hp:12000,spd:105,w:46,h:132,look:'spear',base:'spear',cut:'bcapt',elite:1,armor:2000,
+    atk:{range:185,wind:.46,dur:.9,hit:{off:10,w:190,dmg:[200,240],stun:.5,kx:340}},cd:[.75,1.3]},
+});
+// elites reuse the soldier rigs, drawn larger
+for(const [k,src] of [['chief','spear'],['bcapt','bknight']]){const R=ECUT[src];if(R)ECUT[k]=Object.assign({},R,{imgKey:'cut_'+src,kb:Object.assign({},R.kb,{sc:((R.kb&&R.kb.sc)||1)*1.28})})}
+// chapter 1: 정문, 회랑, [병영], 제단, [두목의 막사], 왕좌
+ROOMS.splice(2,0,{w:1600,nm:'잿빛 성채 · 무너진 병영',spawn:[['grunt',600],['grunt',720],['caster',900],['grunt',1000],['grunt',1150],['caster',1350]],
+  wave2:[['spear',300],['grunt',450],['grunt',1300],['spear',1450],['caster',1500]]});
+ROOMS.splice(4,0,{w:1300,nm:'잿빛 성채 · 두목의 막사',elite:1,spawn:[['chief',900],['grunt',700],['grunt',1100]]});
+// chapter 2: 성문, 회랑, [박쥐 둥지], 납골당, [대장의 무기고], 옥좌
+{const i=ROOMS.findIndex(r=>r.ch===2);
+  ROOMS.splice(i+2,0,{w:1550,nm:'혈월 고성 · 박쥐 둥지',ch:2,spawn:[['bat',600],['bat',760],['ghoul',880],['bat',1000],['ghoul',1150],['bat',1300]],
+    wave2:[['bat',300],['bat',500],['ghoul',650],['bat',1250],['ghoul',1400],['bat',1500]]});
+  ROOMS.splice(i+4,0,{w:1300,nm:'혈월 고성 · 대장의 무기고',ch:2,elite:1,spawn:[['bcapt',900],['ghoul',650],['bpriest',1150]]})}
+// reinforcements arrive once the first wave is down
+const _lrW=loadRoom;loadRoom=function(i){_lrW(i);if(room)room._w2=false;if(room&&room.elite){roomBanner=2.2;sfx('roar')}};
+const _wuW=worldUpdate;worldUpdate=function(dt){const W2=room&&room.wave2&&!room._w2&&!room.dg;let s0;
+  if(W2){s0=sfx;sfx=function(n,a){if(n!=='clear')s0(n,a)}}const g0=gateOpen;
+  try{_wuW(dt)}finally{if(W2)sfx=s0}
+  if(W2&&!g0&&gateOpen){gateOpen=false;room._w2=true;nums=nums.filter(n=>!/다음 방으로/.test(String(n.v)));
+    for(const [t,x] of room.wave2){const e=spawnEnemy(t,clamp(x,60,room.w-60));e.aggro=true}
+    addNum(player.x,player.y,player.z+170,'증원이 몰려온다!',0);sfx('roar');shake=Math.max(shake,8)}};
 let barA=1,paused=false;
 let chapterBanner=0;
 // ===================== HUD & main =====================
@@ -1759,7 +1785,7 @@ const ACH=[
   ['d1','🔥','중급자 정복','중급자로 전체 클리어',200],
   ['d2','⚡','고급자 정복','고급자로 전체 클리어',400],
   ['d3','👑','마스터 정복','마스터로 전체 클리어',1000],
-  ['fast','💨','질풍','전체 클리어를 8분 안에',400],
+  ['fast','💨','질풍','전체 도전을 11분 안에 클리어',400],
   ['noult','🧘','각성은 사치','각성기 없이 전체 클리어',500],
   ['sss','🏆','완벽주의자','SSS 랭크로 클리어',600],
   ['die10','🪦','칠전팔기','10번 쓰러지기 (포기하지 마!)',50,()=>[ST.deaths,10]],
@@ -1787,7 +1813,7 @@ const _kA=kill;kill=function(e){const was=e.deadPending;_kA(e);if(was||e.T.dummy
   if(e.type==='boss'){const vl=e.T.kind==='vlord';ach(vl?'vlad':'gord');if(dmgTaken===RUN.bossDmg)ach(vl?'vladNH':'gordNH');if(player&&player.hp>0&&player.hp<=player.max*0.1)ach('clutch')}
   if(ST.kills%10===0||ST.kills===100||ST.kills===500){saveNow();achCheck()}};
 const _srA=showResult;showResult=function(win){_srA(win);if(!win)ST.deaths++;else{ST.clears++;
-    if(startCh===1&&RUNALL){ach('d'+diffI);if(runTime<=480)ach('fast');if(RUN.ult===0)ach('noult')}
+    if(startCh===1&&RUNALL){ach('d'+diffI);if(runTime<=660)ach('fast');if(RUN.ult===0)ach('noult')}
     const rk=ovStats.querySelector('b');if(rk&&rk.textContent==='SSS')ach('sss')}
   saveNow();achCheck()};
 // drain-grab escape + tutorial completion
