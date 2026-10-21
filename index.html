@@ -209,8 +209,8 @@ html.menu .touch{display:none!important}
 <div class="hTop"><div class="cur" title="잿가루"><i class="itic" data-i="12"></i><b id="hAsh">0</b></div><div class="cur" title="강화석"><i class="itic" data-i="13"></i><b id="hStone">0</b></div><button type="button" class="gear" id="hSet" aria-label="설정"></button></div>
 <button type="button" class="dia big" id="bAdv" style="--s:40cqh;right:13cqh;top:31cqh" data-ic="swords"><em>모험</em></button>
 <button type="button" class="dia" id="bItem" style="--s:25cqh;right:49cqh;top:15cqh" data-ic="gem"><em>아이템 던전</em></button>
-<button type="button" class="dia" id="bEquip" style="--s:25cqh;right:3cqh;top:9cqh" data-ic="shield"><em>장비</em></button>
-<div class="hBot"><button type="button" class="dia sm" id="tutBtn" data-ic="book"><em>튜토리얼</em></button><button type="button" class="dia sm" id="bBag" data-ic="bag"><em>가방</em></button><button type="button" class="dia sm" id="bRank" data-ic="trophy"><em>랭킹</em></button><button type="button" class="dia sm" id="bAch" data-ic="medal"><em>업적</em><i class="dot" id="achDot" hidden></i></button></div>
+<button type="button" class="dia" id="bEquip" style="--s:25cqh;right:3cqh;top:9cqh" data-ic="shield"><em>장비 · 가방</em></button>
+<div class="hBot"><button type="button" class="dia sm" id="tutBtn" data-ic="book"><em>튜토리얼</em></button><button type="button" class="dia sm" id="bRank" data-ic="trophy"><em>랭킹</em></button><button type="button" class="dia sm" id="bAch" data-ic="medal"><em>업적</em><i class="dot" id="achDot" hidden></i></button></div>
 <div class="hBanner" id="hBanner"><div class="bTrack" id="bTrack"></div><div class="bDots" id="bDots"></div></div>
 <div id="hToast" hidden></div></div>
 <div id="scrAdv" class="scr" hidden><div class="hBg bgimg dim"></div><button type="button" class="back" id="aBack">‹ 홈</button><h3 class="aTitle">모험</h3>
@@ -1912,7 +1912,7 @@ document.querySelectorAll('.eqcol .slot').forEach(b=>b.addEventListener('click',
 document.querySelectorAll('#iTabs button').forEach(b=>b.addEventListener('click',()=>{iFilter=b.dataset.f;paintInv()}));
 $('iGear').addEventListener('change',e=>{SAVE.useGear=e.target.checked;saveNow()});
 $('iClose').addEventListener('click',()=>{$('invOv').hidden=true;saveNow();if(curScr==='home')paintHome()});
-$('bEquip').addEventListener('click',()=>openInv(''));$('bBag').addEventListener('click',()=>openInv(''));
+$('bEquip').addEventListener('click',()=>openInv(''));
 const _phI=paintHome;paintHome=function(){_phI();$('hStone').textContent=SAVE.stone};
 
 // ---------- item dungeon ----------
