@@ -2239,7 +2239,7 @@ const AH=()=>authed()?{apikey:SB_KEY,Authorization:'Bearer '+AUTH.at,'Content-Ty
 (function(){authLoad();const h=location.hash;if(h&&h.includes('access_token=')){const q=new URLSearchParams(h.slice(1));
   AUTH.at=q.get('access_token');AUTH.rt=q.get('refresh_token');AUTH.exp=Date.now()+(+q.get('expires_in')||3600)*1000;AUTH.uid=null;AUTH.nick=null;AUTH.fresh=1;authStore();
   try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}}
-  else if(h&&h.includes('error_description=')){const q=new URLSearchParams(h.slice(1));AUTH.err=q.get('error_description');try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}}})();
+  else{const q=h&&h.includes('error')?new URLSearchParams(h.slice(1)):new URLSearchParams(location.search);if(q.get('error')){AUTH.err=q.get('error_description')||q.get('error');try{history.replaceState(null,'',location.pathname)}catch(e){}}}})();
 async function authRefresh(){if(!AUTH.rt)return false;try{const r=await fetch(`${SB_URL}/auth/v1/token?grant_type=refresh_token`,{method:'POST',headers:{apikey:SB_KEY,'Content-Type':'application/json'},body:JSON.stringify({refresh_token:AUTH.rt})});
   if(!r.ok){if(r.status===400||r.status===401)authClear();return false}const j=await r.json();AUTH.at=j.access_token;AUTH.rt=j.refresh_token;AUTH.exp=Date.now()+(j.expires_in||3600)*1000;authStore();return true}catch(e){return false}}
 async function authReady(){if(!AUTH.at)return false;if(Date.now()>AUTH.exp-60000)await authRefresh();return authed()||!!AUTH.at}
@@ -2282,7 +2282,7 @@ document.head.insertAdjacentHTML('beforeend',`<style>
 .lmod .row{display:flex;gap:1.6cqh;flex-wrap:wrap;justify-content:center}
 .lmod button.p{background:linear-gradient(#e8433a,#9a1420);color:#fff;border:0;border-radius:1.4cqh;padding:1.6cqh 4cqh;font-size:3.2cqh;font-family:inherit}
 .lmod button.s{background:#2a2238;color:#cfc6dc;border:1px solid #4a3e5c;border-radius:1.4cqh;padding:1.6cqh 4cqh;font-size:3cqh;font-family:inherit}
-.lmod .err{color:#ff7a6a;min-height:1.2em}
+.lmod .err{color:#ff7a6a;min-height:1.2em}#chP{white-space:pre-line;word-break:break-all}
 .acct{display:flex;flex-direction:column;gap:1.2cqh;border-top:1px solid #3a3048;padding-top:2cqh}.acct .row{display:flex;gap:1.2cqh;flex-wrap:wrap}
 .acct button{background:#2a2238;color:#cfc6dc;border:1px solid #4a3e5c;border-radius:1.2cqh;padding:1.1cqh 2.6cqh;font-size:2.7cqh;font-family:inherit}.acct button.d{color:#ff8a7a;border-color:#6a2a30}
 </style>`);
@@ -2338,7 +2338,7 @@ const _whoA=authWho;authWho=async function(){await _whoA();if(AUTH.nick)sendPend
 const _snA=saveNick;saveNick=async function(){await _snA();if(AUTH.nick&&$('nickOv').hidden)sendPending()};
 $('nkOk').removeEventListener('click',_snA);$('nkOk').addEventListener('click',()=>saveNick());
 
-paintAuth();if(AUTH.err)setTimeout(()=>toast('로그인하지 못했어요: '+AUTH.err),800);
+paintAuth();if(AUTH.err){try{localStorage.setItem('ash_nologin','1')}catch(e){}setTimeout(()=>choose('구글 로그인에 실패했어요.\n'+AUTH.err,[['확인',()=>{}],['다시 시도',authLogin]]),900)}
 if(AUTH.at)authWho();
 </script>
 
