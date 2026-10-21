@@ -1364,11 +1364,11 @@ function ignisAtk(e,dt){const a=e.atk,p=player;a.t+=dt;const fast=e.phase2?0.85:
 const _bt3=bossThink,_ba3=bossAtk;
 bossThink=function(e,dt,dx,dy){return e.T.kind==='ignis'?ignisThink(e,dt,dx,dy):_bt3(e,dt,dx,dy)};
 bossAtk=function(e,dt){return e.T.kind==='ignis'?ignisAtk(e,dt):_ba3(e,dt)};
-const _ep3=enemyPose;enemyPose=function(e){if(e.T&&e.T.kind==='ignis'&&e.atk&&e.st!=='air'){const a=e.atk,t=a.t,M={cleave:'swing',dash:'charge',meteor:'pound'}[a.k];
+const IGP={wa:-2.35,hand:[4,-6],bhand:[-10,14]};const _ep3=enemyPose;enemyPose=function(e){if(e.T&&e.T.kind==='ignis'&&e.atk&&e.st!=='air'){const a=e.atk,t=a.t,M={cleave:'swing',dash:'charge',meteor:'pound'}[a.k];
     if(M){const k0=a.k;a.k=M;try{return _ep3(e)}finally{a.k=k0}}
     if(a.k==='pillars')return full({lean:-.15,hand:[16,-44],wa:-1.3,bhand:[-20,-36],head:-.2});
     if(a.k==='inferno')return full(t<1.0?{lean:-.1,hand:[18,-40],wa:-1.3,bhand:[-22,-30],footF:[8,-10],footB:[-10,-6]}:{lean:.2,hand:[34,20],wa:.9,bhand:[-24,18]})}
-  const P=_ep3(e);if(e.T&&e.T.kind==='ignis'&&!e.atk&&(e.st==='walk'||e.st==='idle')){P.wa=1.15;P.hand=[16,24]}return P};
+  const P=_ep3(e);if(e.T&&e.T.kind==='ignis'&&!e.atk&&(e.st==='walk'||e.st==='idle')){const I=IGP;P.wa=I.wa;P.hand=I.hand.slice();P.bhand=I.bhand.slice();if(e.st==='walk'){P.hand[1]+=Math.sin(e.walk)*2}}return P};
 // fiery aura behind the general
 const _drA=drawRig;drawRig=function(e,P,L,o){if(e&&e.T&&e.T.kind==='ignis'&&!(o&&o.tint)){ctx.save();ctx.globalCompositeOperation='lighter';const g=ctx.createRadialGradient(0,-90,10,0,-90,170);
     g.addColorStop(0,`rgba(255,110,20,${0.2+0.07*Math.sin(time*4)})`);g.addColorStop(1,'rgba(255,60,0,0)');ctx.fillStyle=g;ctx.fillRect(-180,-270,360,300);ctx.restore()}return _drA(e,P,L,o)};
