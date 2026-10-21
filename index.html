@@ -173,6 +173,23 @@ html.land #mutef,html.rot #mutef{display:block}
 .mod #sName{background:#0e0b14;border:1px solid #4a3e5c;border-radius:1cqh;color:#fff;padding:1.2cqh 2cqh;font:inherit}
 #sClose{margin-top:1cqh;background:linear-gradient(#e8433a,#9a1420);border:0;color:#fff;border-radius:1.4cqh;padding:1.6cqh;font-size:3.4cqh}
 html.menu .touch{display:none!important}
+
+.dia .dot{position:absolute;right:20%;top:16%;width:2.6cqh;height:2.6cqh;border-radius:50%;background:#e8433a;border:.3cqh solid #fff;box-shadow:0 0 1cqh #e8433a}
+#achOv{position:absolute;inset:0;z-index:45;background:rgba(4,2,8,.78);display:flex;align-items:center;justify-content:center}
+.amod{width:min(94%,150cqh);height:88%;padding:3cqh 3.4cqh;gap:2cqh}
+.ahead{display:flex;align-items:center;gap:2cqh}.ahead b{font-family:"Black Han Sans",sans-serif;font-weight:400;font-size:5cqh;color:#ffd27a}.ahead span{color:#b9a98a;font-size:3cqh;flex:1}
+#achClose{background:none;border:1px solid #4a3e5c;color:#fff;border-radius:50%;width:6cqh;height:6cqh;font-size:3cqh}
+.alist{flex:1;overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(62cqh,1fr));gap:1.6cqh;align-content:start;padding-right:1cqh}
+.ai{display:flex;gap:2cqh;align-items:center;background:#1e1828;border:1px solid #3a3048;border-radius:1.6cqh;padding:1.6cqh 2cqh}
+.ai .ic{flex:0 0 8cqh;height:8cqh;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:4.4cqh;background:#120e18;border:.3cqh solid #3a3048;filter:grayscale(1);opacity:.5}
+.ai.ok{border-color:#c9a04a;background:linear-gradient(90deg,#2e2416,#1e1828)}.ai.ok .ic{filter:none;opacity:1;border-color:#ffd27a;box-shadow:0 0 2cqh rgba(255,210,122,.4)}
+.ai .tx{flex:1;min-width:0}.ai .tx b{display:block;font-weight:400;font-size:3.3cqh;color:#fff}.ai .tx small{display:block;font-size:2.5cqh;color:#a89cb8}
+.ai .bar{height:1cqh;border-radius:.5cqh;background:#0e0b14;margin-top:.8cqh;overflow:hidden}.ai .bar i{display:block;height:100%;background:#c9a04a}
+.ai .rw{font-size:2.6cqh;color:#ffd27a;white-space:nowrap}.ai.ok .rw{color:#7dff9a}
+#achPop{position:absolute;left:50%;top:10cqh;transform:translateX(-50%);z-index:38;display:flex;align-items:center;gap:2cqh;background:linear-gradient(90deg,rgba(46,36,22,.96),rgba(22,18,30,.96));border:.3cqh solid #ffd27a;border-radius:999px;padding:1.2cqh 3.4cqh 1.2cqh 1.4cqh;box-shadow:0 0 4cqh rgba(255,210,122,.4);animation:apop .4s cubic-bezier(.2,1.4,.4,1);pointer-events:none}
+#achPop>i{width:7cqh;height:7cqh;border-radius:50%;background:#120e18;border:.3cqh solid #ffd27a;display:flex;align-items:center;justify-content:center;font-style:normal;font-size:4cqh}
+#achPop small{display:block;font-size:2.3cqh;color:#ffd27a}#achPop b{font-weight:400;font-size:3.6cqh;color:#fff}#achPop em{font-style:normal;font-size:3cqh;color:#7dff9a;margin-left:1cqh}
+@keyframes apop{from{transform:translate(-50%,-6cqh);opacity:0}}
 </style>
 <div class="wrap">
 <header><h1>잿빛 검사<small>Ashen Blade</small></h1></header>
@@ -193,7 +210,7 @@ html.menu .touch{display:none!important}
 <button type="button" class="dia big" id="bAdv" style="--s:40cqh;right:13cqh;top:31cqh" data-ic="swords"><em>모험</em></button>
 <button type="button" class="dia soon" id="bItem" style="--s:25cqh;right:49cqh;top:15cqh" data-ic="gem"><em>아이템 던전</em><s>준비 중</s></button>
 <button type="button" class="dia soon" id="bEquip" style="--s:25cqh;right:3cqh;top:9cqh" data-ic="shield"><em>장비</em><s>준비 중</s></button>
-<div class="hBot"><button type="button" class="dia sm" id="tutBtn" data-ic="book"><em>튜토리얼</em></button><button type="button" class="dia sm soon" id="bBag" data-ic="bag"><em>가방</em></button><button type="button" class="dia sm" id="bRank" data-ic="trophy"><em>랭킹</em></button><button type="button" class="dia sm soon" id="bAch" data-ic="medal"><em>업적</em></button></div>
+<div class="hBot"><button type="button" class="dia sm" id="tutBtn" data-ic="book"><em>튜토리얼</em></button><button type="button" class="dia sm soon" id="bBag" data-ic="bag"><em>가방</em></button><button type="button" class="dia sm" id="bRank" data-ic="trophy"><em>랭킹</em></button><button type="button" class="dia sm" id="bAch" data-ic="medal"><em>업적</em><i class="dot" id="achDot" hidden></i></button></div>
 <div class="hBanner" id="hBanner"><div class="bTrack" id="bTrack"></div><div class="bDots" id="bDots"></div></div>
 <div id="hToast" hidden></div></div>
 <div id="scrAdv" class="scr" hidden><div class="hBg bgimg dim"></div><button type="button" class="back" id="aBack">‹ 홈</button><h3 class="aTitle">모험</h3>
@@ -202,6 +219,8 @@ html.menu .touch{display:none!important}
 <div class="aDiff"><div class="diff" role="group" aria-label="난이도"><button type="button" data-diff="0">초급자</button><button type="button" data-diff="1">중급자</button><button type="button" data-diff="2">고급자</button><button type="button" data-diff="3">마스터</button></div>
 <p id="diffDesc" class="diffd"></p>
 </div><button type="button" id="aGo">출발 ▶</button></div>
+<div id="achOv" hidden><div class="mod amod"><div class="ahead"><b>업적</b><span id="achCnt"></span><button type="button" id="achClose" aria-label="닫기">✕</button></div><div class="alist" id="achList"></div></div></div>
+<div id="achPop" hidden><i></i><div><small>업적 달성!</small><b></b></div><em></em></div>
 <div id="setOv" hidden><div class="mod"><b>설정</b>
 <label>닉네임<input id="sName" maxlength="12" placeholder="랭킹에 쓰일 이름" autocomplete="off"></label>
 <label>배경음악 <output id="oMus"></output><input type="range" id="sMus" min="0" max="100"></label>
@@ -1633,7 +1652,7 @@ let bubT=0;
 $('hArt').addEventListener('click',()=>{const b=$('hBubble');b.querySelector('span').textContent=LINES[Math.floor(Math.random()*LINES.length)];b.hidden=false;b.style.animation='none';void b.offsetWidth;b.style.animation='';sfx('ui');clearTimeout(bubT);bubT=setTimeout(()=>b.hidden=true,3600)});
 function toast(t){const e=$('hToast');e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,1500)}
 $('bAdv').addEventListener('click',()=>showScr('adv'));
-for(const id of ['bItem','bEquip','bBag','bAch'])$(id).addEventListener('click',()=>toast('준비 중이에요! 곧 열립니다'));
+for(const id of ['bItem','bEquip','bBag'])$(id).addEventListener('click',()=>toast('준비 중이에요! 곧 열립니다'));
 $('bRank').addEventListener('click',()=>rkOpen(diffI,SAVE.ch===2?2:1));
 // banner
 let bnI=0,bnN=0;
@@ -1714,6 +1733,77 @@ function rainLoop(t){requestAnimationFrame(rainLoop);const scr=curScr==='title'?
   // occasional lightning
   if(!LOB.lt||t>LOB.lt){LOB.lt=t+6000+Math.random()*9000;LOB.fl=1}if(LOB.fl>0){g.fillStyle=`rgba(200,210,255,${LOB.fl*0.18*dim})`;g.fillRect(0,0,W2,H2);LOB.fl-=0.06}}
 requestAnimationFrame(rainLoop);
+// ===================== achievements =====================
+SAVE.ach=SAVE.ach||{};SAVE.st=Object.assign({kills:0,bats:0,deaths:0,maxCombo:0,clears:0},SAVE.st||{});
+const ST=SAVE.st;
+// [id, icon, name, description, reward, progress()->[cur,goal] (optional)]
+const ACH=[
+  ['tut','📖','첫 걸음','튜토리얼을 끝까지 마치기',50],
+  ['k1','🗡','첫 사냥','적을 처음으로 쓰러뜨리기',20],
+  ['k100','⚔','백인참','적 100마리 쓰러뜨리기',150,()=>[ST.kills,100]],
+  ['k500','☠','잿빛 학살자','적 500마리 쓰러뜨리기',400,()=>[ST.kills,500]],
+  ['bat50','🦇','박쥐 사냥꾼','흡혈 박쥐 50마리 쓰러뜨리기',150,()=>[ST.bats,50]],
+  ['c30','✦','콤보 입문','30콤보 달성',80,()=>[ST.maxCombo,30]],
+  ['c100','✸','콤보 장인','100콤보 달성',250,()=>[ST.maxCombo,100]],
+  ['c200','❂','끝나지 않는 춤','200콤보 달성',500,()=>[ST.maxCombo,200]],
+  ['gord','🪓','오우거 사냥꾼','철갑 오우거 고르둔 처치',150],
+  ['gordNH','🛡','털끝 하나 못 건드려','고르둔을 한 대도 안 맞고 처치',400],
+  ['vlad','🌕','혈월을 꺾다','혈월의 군주 발라크 처치',300],
+  ['vladNH','🩸','피 한 방울도','발라크를 한 대도 안 맞고 처치',800],
+  ['groggy','💥','철벽 붕괴','보스의 슈퍼아머를 깨서 그로기 만들기',100],
+  ['escape','🦷','송곳니를 뿌리치다','발라크의 흡혈 잡기에서 탈출하기',100],
+  ['clutch','❤','구사일생','체력 10% 이하로 보스 처치',300],
+  ['d0','🌱','초급자 정복','초급자로 전체 클리어',100],
+  ['d1','🔥','중급자 정복','중급자로 전체 클리어',200],
+  ['d2','⚡','고급자 정복','고급자로 전체 클리어',400],
+  ['d3','👑','마스터 정복','마스터로 전체 클리어',1000],
+  ['fast','💨','질풍','전체 클리어를 8분 안에',400],
+  ['noult','🧘','각성은 사치','각성기 없이 전체 클리어',500],
+  ['sss','🏆','완벽주의자','SSS 랭크로 클리어',600],
+  ['die10','🪦','칠전팔기','10번 쓰러지기 (포기하지 마!)',50,()=>[ST.deaths,10]],
+  ['ash1k','🔸','잿가루 수집가','잿가루 누적 1,000 모으기',100,()=>[SAVE.xp,1000]],
+  ['ash10k','🔶','잿가루 부자','잿가루 누적 10,000 모으기',500,()=>[SAVE.xp,10000]],
+  ['lv10','⭐','숙련된 검사','레벨 10 달성',300,()=>[lvOf(SAVE.xp),10]],
+];
+const ACHM=Object.fromEntries(ACH.map(a=>[a[0],a]));
+const popQ=[];let popOn=false,achBoot=true;
+function ach(id){if(SAVE.ach[id]||!ACHM[id])return;const a=ACHM[id];SAVE.ach[id]=Date.now();SAVE.ash+=a[4];SAVE.xp+=a[4];SAVE.achNew=1;saveNow();if(!achBoot){popQ.push(a);nextPop()}paintAchDot();if(curScr==='home')paintHome();setTimeout(achCheck,0)}
+function nextPop(){if(popOn||!popQ.length)return;popOn=true;const a=popQ.shift(),P=$('achPop');P.querySelector('i').textContent=a[1];P.querySelector('b').textContent=a[2];P.querySelector('em').textContent='+'+a[4];
+  P.hidden=false;P.style.animation='none';void P.offsetWidth;P.style.animation='';sfx('cmbmile',50);setTimeout(()=>{P.hidden=true;popOn=false;setTimeout(nextPop,250)},2600)}
+function achCheck(){for(const a of ACH)if(a[5]&&!SAVE.ach[a[0]]){const [c,g]=a[5]();if(c>=g)ach(a[0])}let t=0;try{t=+localStorage.getItem('ash_tut')}catch(e){}if(t)ach('tut')}
+function paintAchDot(){$('achDot').hidden=!SAVE.achNew}
+// ---------- per-run tracking ----------
+const RUN={ult:0,bossDmg:0,inTut:()=>typeof tut!=='undefined'&&!!tut};
+const _sgA=startGame;startGame=function(){RUN.ult=0;_sgA()};
+const _smA=startMove;startMove=function(n){_smA(n);if(n==='skE'&&!RUN.inTut())RUN.ult++};
+const _lrA=loadRoom;loadRoom=function(i){_lrA(i);if(room&&room.boss)RUN.bossDmg=dmgTaken};
+const _ahA=applyHit;applyHit=function(tg,h,att,opt){const g0=tg.groggy;const r=_ahA(tg,h,att,opt);if(r&&!RUN.inTut()){
+  if(tg.type==='boss'&&!(g0>0)&&tg.groggy>0)ach('groggy');
+  if(combo.n>ST.maxCombo){ST.maxCombo=combo.n;if(combo.n===30||combo.n===100||combo.n===200)achCheck()}}return r};
+const _kA=kill;kill=function(e){const was=e.deadPending;_kA(e);if(was||e.T.dummy||RUN.inTut())return;
+  ST.kills++;if(e.type==='bat')ST.bats++;ach('k1');
+  if(e.type==='boss'){const vl=e.T.kind==='vlord';ach(vl?'vlad':'gord');if(dmgTaken===RUN.bossDmg)ach(vl?'vladNH':'gordNH');if(player&&player.hp>0&&player.hp<=player.max*0.1)ach('clutch')}
+  if(ST.kills%10===0||ST.kills===100||ST.kills===500){saveNow();achCheck()}};
+const _srA=showResult;showResult=function(win){_srA(win);if(!win)ST.deaths++;else{ST.clears++;
+    if(startCh===1){ach('d'+diffI);if(runTime<=480)ach('fast');if(RUN.ult===0)ach('noult')}
+    const rk=ovStats.querySelector('b');if(rk&&rk.textContent==='SSS')ach('sss')}
+  saveNow();achCheck()};
+// drain-grab escape + tutorial completion
+let _grabA=null;setInterval(()=>{const p=player;if(!p||state!=='play')return;if(p.grab&&!_grabA)_grabA=p.grab;else if(!p.grab&&_grabA){_grabA=null;if(p.hp>0)ach('escape')}
+  if(typeof tut!=='undefined'&&tut&&tut.done)ach('tut')},120);
+// ---------- panel ----------
+function openAch(){const L=$('achList');L.innerHTML='';let n=0;
+  for(const a of ACH){const ok=!!SAVE.ach[a[0]];if(ok)n++;const d=document.createElement('div');d.className='ai'+(ok?' ok':'');
+    let bar='';if(a[5]&&!ok){const [c,g]=a[5]();bar=`<div class="bar"><i style="width:${Math.min(100,c/g*100)}%"></i></div><small>${Math.min(c,g).toLocaleString()} / ${g.toLocaleString()}</small>`}
+    d.innerHTML=`<div class="ic">${a[1]}</div><div class="tx"><b></b><small></small>${bar}</div><div class="rw">${ok?'✔ 달성':'+'+a[4]}</div>`;
+    d.querySelector('b').textContent=a[2];d.querySelector('.tx>small').textContent=a[3];L.appendChild(d)}
+  const sorted=[...L.children].sort((x,y)=>(x.classList.contains('ok')?1:0)-(y.classList.contains('ok')?1:0));sorted.forEach(x=>L.appendChild(x));
+  $('achCnt').textContent=`${n} / ${ACH.length} 달성`;$('achOv').hidden=false;SAVE.achNew=0;saveNow();paintAchDot()}
+$('bAch').addEventListener('click',openAch);
+$('achClose').addEventListener('click',()=>{$('achOv').hidden=true;paintHome()});
+// grant what earlier progress already proves
+if(SAVE.prog.c1)ach('gord');if(SAVE.prog.c2)ach('vlad');
+achCheck();achBoot=false;paintAchDot();
 </script>
 
 </body></html>
