@@ -497,7 +497,7 @@ function loadRoom(i){roomI=i;room=ROOMS[i];mons=[];shots=[];fxs=[];boss=null;gat
   for(const [t,x] of room.spawn)spawnEnemy(t,x);buildBg();roomBanner=2.2;if(room.boss){bossIntro=2.4;sfx('bossin')}}
 let roomBanner=0,bossIntro=0;
 let splits=[],chStart=0,startCh=1,RUNALL=false;
-const PB={atk:1,crit:0,hp:0,def:1,mpr:1,cdr:1,emul:1,boss:1,combo:1,kheal:0,ult:1};
+let ULTM=1,ULTF=1;const PB={atk:1,crit:0,hp:0,def:1,mpr:1,cdr:1,emul:1,boss:1,combo:1,kheal:0,ult:1};
 function startGame(){if(typeof track==='function')track('start');auInit();player=newPlayer();runTime=0;splits=[];chStart=0;maxCombo=0;dmgTaken=0;combo.n=0;nums=[];imgs=[];loadRoom(0);state='play';ov.hidden=true;fade=1;fadeDir=-1}
 
 // ---------- hit system ----------
@@ -581,7 +581,7 @@ function moveUpdate(dt){
   if(M.air||p.move==='air'){p.vz-=GRAV*0.55*dt;p.z=Math.max(0,p.z+p.vz*dt);p.x+=dx*120*dt}
   if(p.move==='skF'){const u=Math.min(1,t/0.43);p.z=p.slamZ0*(1-u)+Math.sin(u*Math.PI)*120*(1-u*0.15);if(t>=0.43)p.z=0;p.x+=p.face*90*dt*(t<0.43?1:0)}
   if(p.move==='skQ'){if(p.diveT>0){p.diveT-=dt;p.vz-=GRAV*dt;p.z=Math.max(1,p.z+p.vz*dt)}else{p.vz=-1300;p.z+=p.vz*dt;p.x+=p.face*230*dt;
-      if(p.z<=0&&!p.diveHit){p.z=0;p.diveHit=true;p.mt=Math.max(p.mt,0.62);const h={off:-120,w:240,dy:56,dmg:[440,520],stun:.6,kz:330,bounce:1,otg:1,hs:.1,big:1,zr:[-20,160]};
+      if(p.z<=0&&!p.diveHit){p.z=0;p.diveHit=true;p.mt=Math.max(p.mt,0.62);const QD=MOVES.skQ.dive2||{w:240,m:1},h={off:-QD.w/2,w:QD.w,dy:56,dmg:[440*QD.m,520*QD.m],stun:.6,kz:330,bounce:1,otg:1,hs:.1,big:1,zr:[-20,160]};
         for(const e of mons)if(canHit(e)&&overlaps(p,h,e))applyHit(e,h,p);ringFx(p.x,p.y,170,'255,200,120');crackFx(p.x,p.y);spr(3,p.x,p.y,40,{sc:0.75,t:0.35});spr(5,p.x-p.face*30,p.y,90,{face:p.face,sc:0.55,t:0.18});for(let i=0;i<10;i++)dust(p.x+rnd(-60,60),p.y,3);sfx('boom');shake=Math.max(shake,10)}}
     if(p.z>0&&p.mt>0.6&&!p.diveHit)p.mt=0.6}
   else p.diveHit=false;
@@ -589,7 +589,7 @@ function moveUpdate(dt){
   // hits
   M.hits.forEach((h,i)=>{if(t>=h.t&&t0<h.t+h.d){for(const e of mons){if(!canHit(e)||p.hitSets[i].has(e))continue;if(overlaps(p,h,e)){p.hitSets[i].add(e);applyHit(e,h,p)}}}});
   if(p.move==='skF'&&t>=0.43&&t0<0.43){spr(3,p.x+p.face*30,p.y,55,{face:p.face,sc:1.25,t:0.5});ringFx(p.x,p.y,220,'255,190,90');crackFx(p.x,p.y);for(let i=0;i<14;i++)dust(p.x+rnd(-100,100),p.y,4);for(let i=0;i<10;i++)rock(p.x+rnd(-80,80),p.y);flash=0.08;flashCol='255,220,160'}
-  if(M.wave&&t>=M.wave&&t0<M.wave)shots.push({type:'wave',x:p.x+p.face*50,y:p.y,z:p.z+40,vx:p.face*720,face:p.face,life:0.95,hits:new Map(),own:'p'});
+  if(M.wave&&t>=M.wave&&t0<M.wave)for(let wi=0;wi<(M.waves||1);wi++)shots.push({type:'wave',x:p.x+p.face*(50-wi*40),y:p.y,z:p.z+40+(wi?(wi%2?-34:34):0),vx:p.face*720,face:p.face,life:0.95+wi*0.06,hits:new Map(),own:'p',dm:M.wdm||1});
   if(M.ult)ultUpdate(t,t0);
   // chain / cancel
   if(M.next&&t>=M.combo&&buffered('X',0.3)){consume('X');startMove(M.next);return}
@@ -603,11 +603,11 @@ function moveUpdate(dt){
 function ultUpdate(t,t0){const p=player;
   if(t>=0.75&&t<1.6){const k=Math.floor((t-0.75)/0.085),k0=Math.floor((t0-0.75)/0.085);if(t0<0.75||k!==k0){
     const vis=mons.filter(e=>canHit(e)&&e.x>camX-40&&e.x<camX+W+40);
-    for(const e of vis){{const u=DF().ult*(e.type==='boss'?0.6:1);applyHit(e,{dmg:[200*u,240*u],stun:.5,kz:e.z>1?200:0,hs:0.02},p,{ult:1})}if(vis.length)sfx('ult_slash');
+    for(const e of vis){{const u=DF().ult*(e.type==='boss'?0.6:1)*ULTM;applyHit(e,{dmg:[200*u,240*u],stun:.5,kz:e.z>1?200:0,hs:0.02},p,{ult:1})}if(vis.length)sfx('ult_slash');
       const a=rnd(0,Math.PI*2);fxs.push({k:'line',x:e.x,y:e.y,z:e.z+50,a,len:rnd(180,280),t:0.18,m:0.18});if(Math.random()<0.5)spr(Math.random()<0.5?0:6,e.x,e.y,e.z+55,{face:Math.random()<0.5?1:-1,rot:rnd(-1,1),sc:rnd(0.4,0.6),t:0.16})}
     if(vis.length){const e=vis[Math.floor(Math.random()*vis.length)];p.x=e.x+rnd(-90,90);p.y=e.y;p.face=e.x>p.x?1:-1}}}
   if(t>=1.62&&t0<1.62){const vis=mons.filter(e=>canHit(e)&&e.x>camX-40&&e.x<camX+W+40);
-    for(const e of vis){const u=DF().ult*(e.type==='boss'?0.6:1);applyHit(e,{dmg:[1300*u,1500*u],stun:.8,kz:560,hs:0.16,big:1,otg:1},p,{ult:1});ringFx(e.x,e.y,160,'255,230,160');spr(6,e.x,e.y,e.z+60,{sc:1.1,t:0.45});spr(7,e.x,e.y,e.z+60,{sc:0.9,t:0.3})}
+    for(const e of vis){const u=DF().ult*(e.type==='boss'?0.6:1)*ULTM*ULTF;applyHit(e,{dmg:[1300*u,1500*u],stun:.8,kz:560,hs:0.16,big:1,otg:1},p,{ult:1});ringFx(e.x,e.y,160,'255,230,160');spr(6,e.x,e.y,e.z+60,{sc:1.1,t:0.45});spr(7,e.x,e.y,e.z+60,{sc:0.9,t:0.3})}
     flash=0.4;flashCol='255,250,230';shake=24;sfx('ult_end');dark=0}
 }
 function startDash(){const p=player,dx=(K.R?1:0)-(K.L?1:0),dy=(K.D?1:0)-(K.U?1:0);if(dx)p.face=dx;p.move=null;p.z=0;p.st='back';p.t=0.3;p.vx=p.face*560;p.vy=dy*170;p.inv=0.32;sfx('dash')}
@@ -798,7 +798,7 @@ function shotsUpdate(dt){
   for(const s of shots){s.life-=dt;
     if(s.type==='wave'){s.x+=s.vx*dt;for(const e of mons){if(!canHit(e))continue;const n=s.hits.get(e)||0;if(n>=5)continue;
         if(Math.abs(e.x-s.x)<56&&Math.abs(e.y-s.y)<46&&e.z<160){const last=s.hits.get('t'+e.id)||-1;if(time-last<0.075)continue;s.hits.set(e,n+1);s.hits.set('t'+e.id,time);
-          applyHit(e,{dmg:[150,190],stun:.35,kx:420,hs:.02,kz:e.z>1?180:0},{face:s.face,x:s.x})}}
+          applyHit(e,{dmg:[150*(s.dm||1),190*(s.dm||1)],stun:.35,kx:420,hs:.02,kz:e.z>1?180:0},{face:s.face,x:s.x})}}
       if(Math.random()<0.8)fxs.push({k:'glow',x:s.x-s.face*rnd(0,40),y:s.y,z:s.z+rnd(-30,30),r:rnd(6,12),t:0.25,m:0.25,col:'140,210,255'})}
     else if(s.type==='fire'){s.x+=s.vx*dt;const p=player;if(Math.random()<0.9)fxs.push({k:'fire',x:s.x,y:s.y,z:s.z+rnd(-6,6),vz:rnd(10,60),r:rnd(8,14),t:0.35,m:0.35});
       if(Math.abs(p.x-s.x)<30&&Math.abs(p.y-s.y)<26&&p.z<90&&p.inv<=0){hurtPlayer(s.dmg,s.face*240,false);if(typeof priestHeal==='function')priestHeal(s);s.life=0;burst(s.x,s.y,s.z,'255,140,40')}}
@@ -2227,6 +2227,148 @@ const _wuM=worldUpdate;worldUpdate=function(dt){const g0=gateOpen;_wuM(dt);
  // keep the stage's touch handlers from eating the swipe
  for(const ev of ['touchstart','touchmove'])C.addEventListener(ev,e=>e.stopPropagation(),{passive:true});
 }
+// ===================== skill upgrades (spend 잿가루 / 강화석) =====================
+SAVE.sk=Object.assign({skA:0,skS:0,skD:0,skF:0,skQ:0,skW:0,skE:0},SAVE.sk||{});
+const SK_MAX=10;
+const SKINFO={
+  skA:{ic:'↗',k:'U',m5:'MP 소모 25% 감소',m10:'판정 40% 넓게 + 더 높이 띄움'},
+  skS:{ic:'⇉',k:'I',m5:'MP 소모 25% 감소',m10:'찌르기 2타 추가'},
+  skD:{ic:'◎',k:'O',m5:'MP 소모 25% 감소',m10:'회전 3바퀴 추가'},
+  skF:{ic:'⤓',k:'P',m5:'MP 소모 25% 감소',m10:'충격 범위 1.5배'},
+  skQ:{ic:'↘',k:'N',m5:'MP 소모 25% 감소',m10:'착지 범위 1.6배 · 위력 +30%'},
+  skW:{ic:'❯',k:'H',m5:'MP 소모 25% 감소',m10:'검기 3연발'},
+  skE:{ic:'◈',k:'SPACE',m5:'MP 소모 20% 감소',m10:'마지막 일격 위력 +40%'},
+};
+// remember the untouched move data once
+const SKBASE={};for(const n of SKILLS){const M=MOVES[n];SKBASE[n]={mp:M.mp,cd:M.cd,dur:M.dur,hits:JSON.parse(JSON.stringify(M.hits)),push:M.push?JSON.parse(JSON.stringify(M.push)):null}}
+const skDmg=lv=>1+0.07*lv,skCd=lv=>1-0.025*lv;
+const skCost=(n,lv)=>{const b=n==='skE'?2.2:1;return{ash:Math.round(90*b*Math.pow(lv+1,1.55)),stone:lv>=5?(lv-4)*(n==='skE'?2:1):0}};
+const skAny=()=>SKILLS.some(n=>(SAVE.sk[n]||0)>0);
+function applySK(on){
+  for(const n of SKILLS){const B=SKBASE[n],M=MOVES[n],lv=on?(SAVE.sk[n]||0):0,dm=skDmg(lv);
+    M.mp=Math.round(B.mp*(lv>=5?(n==='skE'?0.8:0.75):1));M.cd=+(B.cd*skCd(lv)).toFixed(2);M.dur=B.dur;M.push=B.push?JSON.parse(JSON.stringify(B.push)):undefined;
+    M.hits=B.hits.map(h=>Object.assign({},h,{dmg:[h.dmg[0]*dm,h.dmg[1]*dm]}));
+    const L10=lv>=10;
+    if(n==='skA'&&L10)M.hits=M.hits.map(h=>Object.assign(h,{w:h.w*1.4,off:h.off-10,kz:(h.kz||0)+160}));
+    if(n==='skS'&&L10){const h0=M.hits[0];M.hits.splice(3,0,Object.assign({},h0,{t:.37}),Object.assign({},h0,{t:.47}));M.hits[M.hits.length-1].t=.57;M.dur=.78;if(M.push)M.push=[[.04,.58,620]]}
+    if(n==='skD'&&L10){const last=M.hits[M.hits.length-1];for(let i=0;i<3;i++)M.hits.splice(M.hits.length-1,0,Object.assign({},M.hits[0],{t:.1+(8+i)*.12}));last.t=.1+11*.12;M.dur=1.6}
+    if(n==='skF'&&L10)M.hits=M.hits.map(h=>Object.assign(h,{w:h.w*1.5,off:h.off-h.w*0.25}));
+    if(n==='skQ')M.dive2={w:L10?384:240,m:dm*(L10?1.3:1)};
+    if(n==='skW'){M.waves=L10?3:1;M.wdm=dm}
+    if(n==='skE'){ULTM=dm;ULTF=L10?1.4:1}}}
+// startGame decides: adventure with growth on, or the item dungeon → levels apply
+const _sgSK=startGame;startGame=function(){_sgSK();const on=(typeof DG!=='undefined'&&DG.on)||SAVE.useGear;applySK(on);
+  if(!DG.on&&SAVE.useGear&&skAny()){RUNGEAR=true;RUNPOW=(RUNPOW||0)+skPower()}};
+const _stSK=startTutorial;startTutorial=function(){_stSK();applySK(false)};
+function skPower(){return SKILLS.reduce((a,n)=>a+(SAVE.sk[n]||0)*(n==='skE'?60:35),0)}
+
+// ---------- UI ----------
+document.head.insertAdjacentHTML('beforeend',`<style>
+#skOv{position:absolute;inset:0;z-index:44;background:rgba(4,2,8,.8);display:flex;align-items:center;justify-content:center}
+.skbox{position:relative;width:min(96%,160cqh);height:90%;background:#16121e;border:1px solid #c9a04a;border-radius:2.4cqh;padding:2.6cqh 3cqh;display:flex;flex-direction:column;gap:1.6cqh;color:#ece6f4;font-size:3cqh}
+.skhead{display:flex;align-items:center;gap:2cqh}.skhead b{font-family:"Black Han Sans",sans-serif;font-weight:400;font-size:4.8cqh;color:#ffd27a}.skhead .sp{flex:1}
+.sklist{flex:1;overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(70cqh,1fr));gap:1.4cqh;align-content:start}
+.skc{display:flex;gap:2cqh;align-items:center;background:#1e1828;border:1px solid #3a3048;border-radius:1.6cqh;padding:1.6cqh 2cqh}
+.skc .ic{flex:0 0 10cqh;height:10cqh;border-radius:1.6cqh;background:linear-gradient(145deg,#2a3a5a,#141a2a);border:.3cqh solid #5a8ad8;display:flex;align-items:center;justify-content:center;font-size:5cqh;color:#cfe4ff;position:relative}
+.skc.ult .ic{background:linear-gradient(145deg,#5a2a20,#2a1010);border-color:#e8a03a;color:#ffd27a}
+.skc .ic small{position:absolute;bottom:.4cqh;right:.8cqh;font-size:1.9cqh;color:#9ab}
+.skc .tx{flex:1;min-width:0}.skc .tx b{font-weight:400;font-size:3.3cqh}.skc .tx b i{font-style:normal;color:#ffd27a;margin-left:1cqh}
+.skc .tx small{display:block;color:#a89cb8;font-size:2.4cqh;line-height:1.45}.skc .tx .ms{color:#6a6078}.skc .tx .ms.on{color:#7dff9a}
+.skc .pips{display:flex;gap:.5cqh;margin:.6cqh 0}.skc .pips i{flex:1;height:1cqh;border-radius:.5cqh;background:#0e0b14}.skc .pips i.on{background:#5aa0ff}.skc .pips i.m{outline:1px solid #c9a04a}
+.skc button{flex:0 0 auto;border:0;border-radius:1.2cqh;padding:1.2cqh 2.4cqh;font-size:2.8cqh;font-family:inherit;color:#1a1208;background:linear-gradient(#ffd27a,#c9a04a);line-height:1.25}.skc button small{display:block;font-size:2.1cqh}
+.skc button:disabled{opacity:.35}
+.sknote{color:#8a7f9a;font-size:2.4cqh}
+</style>`);
+STG.insertAdjacentHTML('beforeend',`<div id="skOv" hidden><div class="skbox"><div class="skhead"><b>스킬 강화</b><span class="sp"></span><span class="mat">${icHTML(12)}<b id="skAsh" style="font:inherit;color:#fff">0</b></span><span class="mat">${icHTML(13)}<b id="skStone" style="font:inherit;color:#fff">0</b></span><button type="button" class="xbtn" id="skClose">✕</button></div>
+<div class="sklist" id="skList"></div><div class="sknote">레벨마다 위력 +7% · 쿨타임 -2.5% · 5레벨과 10레벨에 특수 효과. 장비처럼 "장비·스킬 효과 적용"을 켠 모험과 아이템 던전에서만 적용돼요 (끄면 실력 랭킹).</div></div></div>`);
+document.querySelector('.hBot').insertAdjacentHTML('afterbegin',`<button type="button" class="dia sm" id="bSkill" data-ic="bolt"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg><em>스킬</em></button>`);
+function paintSK(){$('skAsh').textContent=Math.floor(SAVE.ash).toLocaleString();$('skStone').textContent=SAVE.stone;const L=$('skList');L.innerHTML='';
+  for(const n of SKILLS){const M=MOVES[n],I=SKINFO[n],lv=SAVE.sk[n]||0,c=skCost(n,lv),max=lv>=SK_MAX,ok=!max&&SAVE.ash>=c.ash&&SAVE.stone>=c.stone;
+    const d=document.createElement('div');d.className='skc'+(n==='skE'?' ult':'');
+    d.innerHTML=`<div class="ic">${I.ic}<small>${KT(I.k,'')}</small></div><div class="tx"><b>${M.nm}<i>Lv ${lv}</i></b>
+      <div class="pips">${[...Array(SK_MAX)].map((_,i)=>`<i class="${i<lv?'on':''} ${i===4||i===9?'m':''}"></i>`).join('')}</div>
+      <small>위력 +${Math.round((skDmg(lv)-1)*100)}% · 쿨타임 -${Math.round((1-skCd(lv))*100)}%${max?'':` → 다음 +${Math.round((skDmg(lv+1)-1)*100)}% / -${Math.round((1-skCd(lv+1))*100)}%`}</small>
+      <small class="ms ${lv>=5?'on':''}">Lv5 · ${I.m5}</small><small class="ms ${lv>=10?'on':''}">Lv10 · ${I.m10}</small></div>
+      <button type="button" ${ok?'':'disabled'}>${max?'최대':`강화<small>잿가루 ${c.ash}${c.stone?` · 석 ${c.stone}`:''}</small>`}</button>`;
+    d.querySelector('button').onclick=()=>{if(!ok)return;SAVE.ash-=c.ash;SAVE.stone-=c.stone;SAVE.sk[n]=lv+1;sfx(lv+1===5||lv+1===10?'cmbmile':'evolve',50);saveNow();paintSK();if(typeof ach==='function'&&lv+1===10)ach('sk10')};
+    L.appendChild(d)}}
+$('bSkill').addEventListener('click',()=>{paintSK();$('skOv').hidden=false});
+$('skClose').addEventListener('click',()=>{$('skOv').hidden=true;paintHome()});
+// wording: the adventure toggle now covers gear and skill levels
+{const g=document.querySelector('label.gearchk');if(g)g.innerHTML='<input type="checkbox" id="aGear"> 장비·스킬 강화 효과 적용 <small>— 켜면 💎성장 랭킹, 끄면 ⚔실력 랭킹에 기록돼요</small>';
+ $('aGear').addEventListener('change',e=>{SAVE.useGear=e.target.checked;saveNow()});
+ const t=document.querySelector('.gtog');if(t)t.lastChild.textContent=' 모험에도 장비·스킬 효과 적용 (켜면 성장 랭킹)'}
+// achievement for maxing a skill
+if(typeof ACH!=='undefined'&&!ACHM.sk10){const a=['sk10','⚡','한계 돌파','스킬 하나를 10레벨까지 강화',500];ACH.push(a);ACHM.sk10=a}
+{const b=document.querySelector('[data-gr="1"]');if(b)b.innerHTML='💎 성장 랭킹 <small>장비·스킬 강화</small>';const a=document.querySelector('[data-gr="0"]');if(a)a.innerHTML='⚔ 실력 랭킹 <small>강화 없이</small>'}
+const _gnSK=showResult;showResult=function(win){_gnSK(win);const g=$('gearNote');if(g&&RUNGEAR)g.textContent=`💎 장비·스킬 강화를 쓴 기록이라 성장 랭킹에 올라가요 (전투력 ${RUNPOW.toLocaleString()})`};
+// ===================== daily missions + attendance =====================
+const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const dayNum=s=>Math.floor(Date.UTC(+s.slice(0,4),+s.slice(5,7)-1,+s.slice(8,10))/864e5);
+// [id, text, goal, reward{ash,stone,cry}]
+const DPOOL=[
+  ['kill40','적 40마리 처치',40,{ash:150}],['kill80','적 80마리 처치',80,{ash:260,stone:1}],
+  ['clear1','모험에서 아무 장이나 클리어',1,{ash:200,stone:1}],['clear2','모험에서 장 2번 클리어',2,{ash:320,stone:2}],
+  ['dg1','아이템 던전 1번 클리어',1,{ash:180,stone:2}],['dg3','아이템 던전 3번 클리어',3,{ash:300,stone:3,cry:1}],
+  ['combo40','40콤보 달성',40,{ash:160}],['combo80','80콤보 달성',80,{ash:260,cry:1}],
+  ['ult3','각성기 3번 사용',3,{ash:150,stone:1}],['boss2','보스 2마리 처치',2,{ash:240,stone:2}],
+  ['elite2','중간 보스 2마리 처치',2,{ash:200,stone:1}],['sk3','스킬 30번 사용',30,{ash:140}],
+];
+const ATT=[{ash:100},{ash:150},{stone:2},{ash:200},{stone:3},{ash:300},{ash:500,cry:3}];
+function rwText(r){return [r.ash?`잿가루 ${r.ash}`:'',r.stone?`강화석 ${r.stone}`:'',r.cry?`마력 결정 ${r.cry}`:''].filter(Boolean).join(' · ')}
+function giveRw(r){SAVE.ash+=r.ash||0;SAVE.xp+=r.ash||0;SAVE.stone+=r.stone||0;SAVE.cry=(SAVE.cry||0)+(r.cry||0)}
+function rollDaily(d){let s=dayNum(d)*2654435761%4294967296;const rnd2=()=>{s=(s*1103515245+12345)%2147483648;return s/2147483648};
+  const ids=[...DPOOL.keys()],pick=[];const groups=new Set();
+  while(pick.length<3&&ids.length){const i=ids.splice(Math.floor(rnd2()*ids.length),1)[0],g=DPOOL[i][0].replace(/\d+$/,'');if(groups.has(g))continue;groups.add(g);pick.push(i)}
+  return pick.map(i=>({id:DPOOL[i][0],p:0,c:0}))}
+SAVE.daily=SAVE.daily||{};
+function dailyCheck(){const d=today(),D=SAVE.daily;let att=null;
+  if(D.d!==d){const gap=D.d?dayNum(d)-dayNum(D.d):1;D.streak=gap===1?((D.streak||0)%7)+1:1;D.d=d;D.list=rollDaily(d);D.att=0}
+  if(!D.att){D.att=1;att=ATT[(D.streak-1)%7];giveRw(att);saveNow();setTimeout(()=>attPop(D.streak,att),900)}
+  paintDailyCard()}
+const DM=id=>DPOOL.find(x=>x[0]===id);
+function dprog(kind,v,abs){const D=SAVE.daily;if(!D.list||D.d!==today()||(typeof tut!=='undefined'&&tut))return;let ch=false;
+  for(const m of D.list){if(m.c)continue;const M=DM(m.id);if(!M||m.id.replace(/\d+$/,'')!==kind)continue;const np=abs?Math.max(m.p,v):m.p+v;if(np!==m.p){m.p=Math.min(M[2],np);ch=true;if(m.p>=M[2]&&!m.done){m.done=1;dToast(`미션 완료! ${M[1]}`)}}}
+  if(ch){saveNow();paintDailyCard()}}
+function dToast(t){const P=$('achPop');if(!P||state!=='play')return toast&&curScr==='home'&&toast(t);P.querySelector('i').textContent='📜';P.querySelector('b').textContent=t.replace('미션 완료! ','');P.querySelector('small').textContent='오늘의 미션 완료!';P.querySelector('em').textContent='';
+  P.hidden=false;P.style.animation='none';void P.offsetWidth;P.style.animation='';sfx('ready',true);setTimeout(()=>{P.hidden=true;P.querySelector('small').textContent='업적 달성!'},2200)}
+// ---------- hooks ----------
+const _kD=kill;kill=function(e){const was=e.deadPending;_kD(e);if(was||e.T.dummy)return;dprog('kill',1);if(e.type==='boss')dprog('boss',1);if(e.T.elite)dprog('elite',1)};
+const _ahD=applyHit;applyHit=function(tg,h,att,opt){const r=_ahD(tg,h,att,opt);if(r&&combo.n>=40&&combo.n%5===0)dprog('combo',combo.n,true);return r};
+const _smD=startMove;startMove=function(n){_smD(n);if(n==='skE')dprog('ult',1);else if(MOVES[n].mp)dprog('sk',1)};
+const _srD=showResult;showResult=function(win){const dg=typeof DG!=='undefined'&&DG.on;_srD(win);if(win){if(dg)dprog('dg',1);else dprog('clear',1)}};
+// ---------- UI ----------
+document.head.insertAdjacentHTML('beforeend',`<style>
+#dCard{position:absolute;left:3cqh;top:66cqh;width:44cqh;background:rgba(16,12,24,.88);border:1px solid rgba(201,160,74,.7);border-radius:1.4cqh;padding:1.2cqh 2cqh;cursor:pointer;color:#ece6f4;font-family:inherit;text-align:left}
+#dCard b{font-weight:400;font-size:2.9cqh;color:#ffd27a}#dCard small{float:right;font-size:2.4cqh;color:#a89cb8;margin-top:.4cqh}
+#dCard .bar{height:1cqh;border-radius:.5cqh;background:#0e0b14;margin-top:1cqh;overflow:hidden}#dCard .bar i{display:block;height:100%;background:linear-gradient(90deg,#c9a04a,#ffd27a)}
+#dCard .dot{position:absolute;right:-1cqh;top:-1cqh;width:2.8cqh;height:2.8cqh;border-radius:50%;background:#e8433a;border:.3cqh solid #fff}
+#dOv{position:absolute;inset:0;z-index:44;background:rgba(4,2,8,.8);display:flex;align-items:center;justify-content:center}
+.dbx{width:min(94%,120cqh);background:#16121e;border:1px solid #c9a04a;border-radius:2.4cqh;padding:3cqh 3.4cqh;display:flex;flex-direction:column;gap:1.6cqh;color:#ece6f4;font-size:3cqh;position:relative}
+.dbx>b{font-family:"Black Han Sans",sans-serif;font-weight:400;font-size:4.8cqh;color:#ffd27a}.dbx .xbtn{position:absolute;right:2.4cqh;top:2.4cqh}
+.dm{display:flex;align-items:center;gap:2cqh;background:#1e1828;border:1px solid #3a3048;border-radius:1.4cqh;padding:1.4cqh 2cqh}.dm.ok{border-color:#c9a04a}.dm.got{opacity:.5}
+.dm .tx{flex:1}.dm .tx small{display:block;color:#a89cb8;font-size:2.4cqh}.dm .bar{height:1cqh;border-radius:.5cqh;background:#0e0b14;margin-top:.8cqh;overflow:hidden}.dm .bar i{display:block;height:100%;background:#5aa0ff}
+.dm button{border:0;border-radius:1.2cqh;padding:1.2cqh 3cqh;font-size:2.8cqh;font-family:inherit;color:#1a1208;background:linear-gradient(#ffd27a,#c9a04a)}.dm button:disabled{opacity:.35}
+.att{display:flex;gap:1cqh}.att div{flex:1;text-align:center;background:#1e1828;border:1px solid #3a3048;border-radius:1.2cqh;padding:1cqh .4cqh;font-size:2.1cqh;color:#a89cb8;line-height:1.4}.att div b{display:block;font-weight:400;font-size:2.6cqh;color:#ece6f4}
+.att div.got{border-color:#7dff9a;color:#7dff9a}.att div.now{border-color:#ffd27a;box-shadow:0 0 2cqh rgba(255,210,122,.35)}
+#attPop{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:46;background:#16121e;border:.3cqh solid #ffd27a;border-radius:2.4cqh;padding:4cqh 6cqh;text-align:center;color:#ece6f4;box-shadow:0 0 6cqh rgba(255,210,122,.35);animation:pop .3s}
+#attPop b{display:block;font-family:"Black Han Sans",sans-serif;font-weight:400;font-size:5.4cqh;color:#ffd27a}#attPop p{margin:1.4cqh 0 2.4cqh;font-size:3.2cqh}
+#attPop button{border:0;border-radius:1.4cqh;padding:1.4cqh 5cqh;font-size:3.2cqh;font-family:inherit;color:#fff;background:linear-gradient(#e8433a,#9a1420)}
+</style>`);
+$('scrHome').insertAdjacentHTML('beforeend',`<button type="button" id="dCard"></button>`);
+STG.insertAdjacentHTML('beforeend',`<div id="dOv" hidden><div class="dbx"><button type="button" class="xbtn" id="dmClose">✕</button><b>오늘의 미션</b><div id="dmList"></div><span style="color:#a89cb8;font-size:2.5cqh">출석 보상 (7일마다 반복)</span><div class="att" id="attRow"></div><small style="color:#6a6078;font-size:2.2cqh">미션은 매일 자정에 바뀌어요. 튜토리얼은 미션에 포함되지 않아요.</small></div></div><div id="attPop" hidden></div>`);
+function paintDailyCard(){const D=SAVE.daily,C=$('dCard');if(!C||!D.list)return;const done=D.list.filter(m=>m.c).length,ready=D.list.some(m=>m.done&&!m.c);const prog=D.list.reduce((a,m)=>a+(m.c||m.done?1:m.p/DM(m.id)[2]),0)/3;
+  C.innerHTML=`<b>📜 오늘의 미션</b><small>${done}/3 · 출석 ${D.streak||1}일째</small><div class="bar"><i style="width:${prog*100}%"></i></div>${ready?'<i class="dot"></i>':''}`}
+function paintDaily(){const D=SAVE.daily,L=$('dmList');L.innerHTML='';
+  for(const m of D.list){const M=DM(m.id);if(!M)continue;const d=document.createElement('div');d.className='dm'+(m.done&&!m.c?' ok':'')+(m.c?' got':'');
+    d.innerHTML=`<div class="tx">${M[1]}<small>${rwText(M[3])} · ${Math.min(m.p,M[2])}/${M[2]}</small><div class="bar"><i style="width:${Math.min(1,m.p/M[2])*100}%"></i></div></div><button type="button" ${m.done&&!m.c?'':'disabled'}>${m.c?'받음':'받기'}</button>`;
+    d.querySelector('button').onclick=()=>{if(!m.done||m.c)return;m.c=1;giveRw(M[3]);sfx('pick');saveNow();paintDaily();paintDailyCard();paintHome()};L.appendChild(d)}
+  const R=$('attRow');R.innerHTML='';const st=D.streak||1;ATT.forEach((a,i)=>{const d=document.createElement('div');d.className=i<st?'got':'';if(i===st-1)d.className='got now';d.innerHTML=`<b>${i+1}일</b>${rwText(a).replace(' · ','<br>')}`;R.appendChild(d)})}
+function attPop(st,r){const P=$('attPop');if(curScr!=='home'){setTimeout(()=>attPop(st,r),1500);return}P.innerHTML=`<b>출석 ${st}일째!</b><p>${rwText(r)} 획득</p><button type="button">확인</button>`;P.hidden=false;sfx('cmbmile',30);P.querySelector('button').onclick=()=>{P.hidden=true;paintHome()}}
+$('dCard').addEventListener('click',()=>{paintDaily();$('dOv').hidden=false});$('dmClose').addEventListener('click',()=>{$('dOv').hidden=true});
+const _phD=paintHome;paintHome=function(){_phD();paintDailyCard();if($('hCry'))$('hCry').textContent=SAVE.cry||0};
+// first home visit of the day triggers attendance (after any cloud load)
+const _ssD=showScr;showScr=function(n){_ssD(n);if(n==='home')dailyCheck()};
 // ===================== Google login (Supabase Auth over plain REST) + cloud save =====================
 const AUTH={at:null,rt:null,exp:0,uid:null,nick:null,email:null,busy:false};
 const AK='ash_auth';
