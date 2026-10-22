@@ -2,7 +2,12 @@
 <html lang="ko"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0b0910">
-<meta property="og:title" content="잿빛 검사"><meta property="og:description" content="손맛 살린 2D 횡스크롤 액션 · 온라인 랭킹">
+<title>잿빛 검사 · Ashen Blade</title>
+<meta name="description" content="손맛 살린 2D 횡스크롤 액션. 3장 스토리 · 아이템 던전 · 업적 · 온라인 랭킹. 설치 없이 브라우저에서 바로 플레이!">
+<meta property="og:type" content="website"><meta property="og:url" content="https://ashen-blade.github.io/">
+<meta property="og:title" content="잿빛 검사 · 브라우저로 바로 하는 액션 게임"><meta property="og:description" content="콤보로 띄우고, 스킬로 잇고, 보스를 쓰러뜨려라. 친구랑 랭킹 경쟁!">
+<meta property="og:image" content="https://ashen-blade.github.io/og.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://ashen-blade.github.io/og.jpg">
 </head><body>
 <title>잿빛 검사</title>
 <meta name="claude:viewport-fit-sides" content="true">
@@ -73,7 +78,7 @@ html.land header,html.land .foot,html.rot header,html.rot .foot{display:none}
 #rkList .n{font-family:"Black Han Sans",sans-serif;color:#ffd27a;text-align:center}#rkList .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #rkList .t{color:#fff}#rkList .c{color:#9ad0ff;font-size:12px}#rkList .r{font-family:"Black Han Sans",sans-serif;color:#ff7a4a}
 #rkList .empty{display:block;text-align:center;color:#9a90ab;border:0}
-.rktabs.st button{border-color:#c9a04a55}.rktabs.gr button{font-size:14px;padding:8px}.rktabs.gr small{display:block;font-size:10px;opacity:.75}.rktabs.gr button[aria-selected="true"]{background:linear-gradient(#e8433a,#9a1420);color:#fff;border-color:#e8433a}#rkList .pw{color:#c06aff;font-size:12px}
+.rktabs.st button{border-color:#c9a04a55}.rktabs.pd button[aria-selected="true"]{background:#5aa0ff;border-color:#5aa0ff;color:#08101e}.rktabs.gr button{font-size:14px;padding:8px}.rktabs.gr small{display:block;font-size:10px;opacity:.75}.rktabs.gr button[aria-selected="true"]{background:linear-gradient(#e8433a,#9a1420);color:#fff;border-color:#e8433a}#rkList .pw{color:#c06aff;font-size:12px}
 .rknote{margin:8px 0 0;font-size:12px;color:#9a90ab;text-align:center}
 #ov{overflow:auto;justify-content:safe center}
 #pauseBtn{position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:6;width:40px;height:34px;border-radius:10px;background:rgba(10,8,18,.6);color:#fff;border:1px solid #4a3e5c;font-size:14px;letter-spacing:-2px}
@@ -241,6 +246,7 @@ html.menu .touch{display:none!important}
 <div class="ovrow"><button type="button" id="ovHome">⌂ 홈으로</button><button id="ovBtn">다시 도전</button><button type="button" id="rkOpen">🏆 랭킹 보기</button></div>
 </div>
 <div id="rkPanel" hidden><div class="rkbox"><div class="rkhead"><b>명예의 전당</b><button type="button" id="rkClose" aria-label="닫기">✕</button></div>
+<div class="rktabs pd" role="tablist"><button type="button" data-pd="1">📅 이번 주</button><button type="button" data-pd="0">🏛 역대</button></div>
 <div class="rktabs gr" role="tablist"><button type="button" data-gr="0">⚔ 실력 랭킹 <small>장비 없이</small></button><button type="button" data-gr="1">💎 장비 랭킹 <small>장비 착용</small></button></div>
 <div class="rktabs st" role="tablist"><button type="button" data-st="1">1장</button><button type="button" data-st="2">2장</button><button type="button" data-st="0">전체 클리어</button></div>
 <div class="rktabs" role="tablist"><button type="button" data-rk="0">초급자</button><button type="button" data-rk="1">중급자</button><button type="button" data-rk="2">고급자</button><button type="button" data-rk="3">마스터</button></div>
@@ -1575,19 +1581,20 @@ const SB_URL='https://lhsnlwnqwfnqaidobclh.supabase.co',SB_KEY='sb_publishable_h
 const RKH={apikey:SB_KEY,'Content-Type':'application/json'};
 const rkEl=id=>document.getElementById(id);
 const OFFSITE=!/github\.io$/.test(location.hostname);
+let rkWeek=1;function weekStart(){const d=new Date(),k=(d.getDay()+6)%7;d.setHours(0,0,0,0);d.setDate(d.getDate()-k);return d}
 let rkTab=1,rkStage=1,rkGear=0,rkMine=[],rkPending=null;
 const STG_NM=['전체 클리어',...CHAPTERS.map(c=>c.n+'장 '+c.nm)];
 function fmtT(s){return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')}
-async function rkFetch(diff,stage,gear){const q=`${SB_URL}/rest/v1/scores?select=id,name,time_sec,max_combo,rank,power&diff=eq.${diff}&stage=eq.${stage}&gear=eq.${gear?'true':'false'}&order=time_sec.asc,max_combo.desc,created_at.asc&limit=10`;
+async function rkFetch(diff,stage,gear){const q=`${SB_URL}/rest/v1/scores?select=id,name,time_sec,max_combo,rank,power&diff=eq.${diff}&stage=eq.${stage}&gear=eq.${gear?'true':'false'}${rkWeek?'&created_at=gte.'+encodeURIComponent(weekStart().toISOString()):''}&order=time_sec.asc,max_combo.desc,created_at.asc&limit=10`;
   const r=await fetch(q,{headers:RKH});if(!r.ok)throw new Error('HTTP '+r.status);return r.json()}
-async function rkShow(diff,stage,gear){if(stage==null)stage=rkStage;if(gear==null)gear=rkGear;rkTab=diff;rkStage=stage;rkGear=gear;const key=diff+'/'+stage+'/'+gear;document.querySelectorAll('[data-gr]').forEach(b=>b.setAttribute('aria-selected',+b.dataset.gr===gear?'true':'false'));document.querySelectorAll('[data-rk]').forEach(b=>b.setAttribute('aria-selected',+b.dataset.rk===diff?'true':'false'));document.querySelectorAll('[data-st]').forEach(b=>b.setAttribute('aria-selected',+b.dataset.st===stage?'true':'false'));
+async function rkShow(diff,stage,gear){if(stage==null)stage=rkStage;if(gear==null)gear=rkGear;rkTab=diff;rkStage=stage;rkGear=gear;const key=diff+'/'+stage+'/'+gear+'/'+rkWeek;document.querySelectorAll('[data-pd]').forEach(b=>b.setAttribute('aria-selected',+b.dataset.pd===rkWeek?'true':'false'));document.querySelectorAll('[data-gr]').forEach(b=>b.setAttribute('aria-selected',+b.dataset.gr===gear?'true':'false'));document.querySelectorAll('[data-rk]').forEach(b=>b.setAttribute('aria-selected',+b.dataset.rk===diff?'true':'false'));document.querySelectorAll('[data-st]').forEach(b=>b.setAttribute('aria-selected',+b.dataset.st===stage?'true':'false'));
   const L=rkEl('rkList');L.innerHTML='<li class="empty">불러오는 중…</li>';
-  try{const rows=await rkFetch(diff,stage,gear);if(rkTab+'/'+rkStage+'/'+rkGear!==key)return;L.innerHTML='';
-    if(!rows.length){L.innerHTML='<li class="empty">아직 기록이 없어요. 첫 번째 클리어의 주인공이 되어보세요!</li>';return}
+  try{const rows=await rkFetch(diff,stage,gear);if(rkTab+'/'+rkStage+'/'+rkGear+'/'+rkWeek!==key)return;L.innerHTML='';
+    if(!rows.length){L.innerHTML=rkWeek?'<li class="empty">이번 주 기록이 아직 없어요. 지금 1등을 차지하세요!</li>':'<li class="empty">아직 기록이 없어요. 첫 번째 클리어의 주인공이 되어보세요!</li>';return}
     rows.forEach((r,i)=>{const li=document.createElement('li');if(rkMine.includes(r.id))li.className='me';
       const cells=[['n',i+1],['nm',r.name],['t',fmtT(r.time_sec)],gear?['pw','전투력 '+(r.power||0).toLocaleString()]:['c',r.max_combo+' 콤보'],['r',r.rank]];
       for(const [c,v] of cells){const s=document.createElement('span');s.className=c;s.textContent=v;li.appendChild(s)}L.appendChild(li)})}
-  catch(e){if(rkTab+'/'+rkStage+'/'+rkGear===key)L.innerHTML=OFFSITE?'<li class="empty">랭킹은 ashen-blade.github.io 에서만 볼 수 있어요.</li>':'<li class="empty">랭킹을 불러오지 못했어요. 인터넷 연결을 확인해 주세요.</li>'}}
+  catch(e){if(rkTab+'/'+rkStage+'/'+rkGear+'/'+rkWeek===key)L.innerHTML=OFFSITE?'<li class="empty">랭킹은 ashen-blade.github.io 에서만 볼 수 있어요.</li>':'<li class="empty">랭킹을 불러오지 못했어요. 인터넷 연결을 확인해 주세요.</li>'}}
 function rkOpen(diff,stage,gear){rkEl('rkPanel').hidden=false;rkShow(diff==null?diffI:diff,stage,gear==null?rkGear:gear)}
 function rkOffer(recs){rkPending=recs;rkMine=[];const box=rkEl('rkSubmit'),inp=rkEl('rkName'),btn=rkEl('rkSend');box.hidden=false;btn.disabled=false;rkEl('rkMsg').textContent='등록될 기록: '+recs.map(r=>STG_NM[r.stage]+' '+fmtT(r.time_sec)).join(' · ');
   try{inp.value=localStorage.getItem('ash_name')||''}catch(e){}const nk=RKA.nick();inp.hidden=!!nk;if(nk){btn.textContent=`${nk}(으)로 랭킹 등록`;btn.focus()}else{btn.textContent='랭킹 등록';inp.focus();setTimeout(()=>{if(!box.hidden)inp.focus()},80)}if(RKA.onOffer)RKA.onOffer()}
@@ -1608,6 +1615,7 @@ rkEl('rkClose').addEventListener('click',()=>{rkEl('rkPanel').hidden=true;ovBtn.
 document.querySelectorAll('[data-rk]').forEach(b=>b.addEventListener('click',()=>rkShow(+b.dataset.rk)));
 document.querySelectorAll('[data-st]').forEach(b=>b.addEventListener('click',()=>rkShow(rkTab,+b.dataset.st)));
 document.querySelectorAll('[data-gr]').forEach(b=>b.addEventListener('click',()=>rkShow(rkTab,rkStage,+b.dataset.gr)));
+document.querySelectorAll('[data-pd]').forEach(b=>b.addEventListener('click',()=>{rkWeek=+b.dataset.pd;rkShow(rkTab,rkStage,rkGear)}));
 // hide submit box whenever a new run starts
 ovBtn.addEventListener('click',()=>{rkEl('rkSubmit').hidden=true;rkEl('rkPanel').hidden=true;rkPending=null});
 
@@ -1865,10 +1873,10 @@ let bnI=0,bnN=0;
 function buildBanner(){const T=$('bTrack');if(T.dataset.ok)return;T.dataset.ok=1;
   const LC=CHAPTERS[CHAPTERS.length-1];const S=[{i:'NEW',b:`${LC.n}장 · ${LC.nm}`,s:`새 장 오픈! ${LC.bossNm}에게 도전하라`,bg:IMG[LC.bg]||IMG.bg2,go:()=>showScr('adv')},
     {i:'NEW',b:'튜토리얼 오픈',s:'처음이라면 훈련장부터!',bg:IMG.bg,go:()=>$('tutBtn').click()},
-    {i:'랭킹',b:'명예의 전당',s:'불러오는 중…',bg:IMG.bg2,go:()=>rkOpen(diffI,0),rk:1}];
+    {i:'주간',b:'이번 주 랭킹 TOP 3',s:'불러오는 중…',bg:IMG.bg2,go:()=>{rkWeek=1;rkOpen(diffI,1,0)},rk:1}];
   bnN=S.length;S.forEach((x,k)=>{const d=document.createElement('div');d.className='bSlide';d.style.backgroundImage=`url(${x.bg.src})`;d.innerHTML=`<i>${x.i}</i><b></b><small></small>`;
     d.querySelector('b').textContent=x.b;d.querySelector('small').textContent=x.s;d.addEventListener('click',()=>{sfx('ui');x.go()});T.appendChild(d);$('bDots').appendChild(document.createElement('span'));
-    if(x.rk)rkFetch(diffI,0,0).then(r=>{d.querySelector('small').textContent=r&&r[0]?`${DIFFS[diffI].nm} 1위 · ${r[0].name} · ${fmtT(r[0].time_sec)}`:'첫 번째 전체 클리어의 주인공이 되어보세요!'}).catch(()=>{d.querySelector('small').textContent='전체 클리어 기록을 확인해 보세요'})});
+    if(x.rk){const w0=rkWeek;rkWeek=1;rkFetch(diffI,1,0).then(r=>{d.querySelector('small').textContent=r&&r.length?'1장 '+r.slice(0,3).map((q,i)=>`${'🥇🥈🥉'.slice(i*2,i*2+2)}${q.name}`).join(' '):'이번 주 1등 자리가 비어 있어요!'}).catch(()=>{d.querySelector('small').textContent='이번 주 랭킹을 확인해 보세요'});rkWeek=w0}});
   bnGo(0);setInterval(()=>{if(curScr==='home')bnGo(bnI+1)},4500)}
 function bnGo(k){bnI=(k+bnN)%bnN;$('bTrack').style.transform=`translateX(${-100*bnI}%)`;[...$('bDots').children].forEach((d,i)=>d.classList.toggle('on',i===bnI))}
 
@@ -2369,6 +2377,51 @@ $('dCard').addEventListener('click',()=>{paintDaily();$('dOv').hidden=false});$(
 const _phD=paintHome;paintHome=function(){_phD();paintDailyCard();if($('hCry'))$('hCry').textContent=SAVE.cry||0};
 // first home visit of the day triggers attendance (after any cloud load)
 const _ssD=showScr;showScr=function(n){_ssD(n);if(n==='home')dailyCheck()};
+// ===================== result share card =====================
+let RES=null;
+const _srS=showResult;showResult=function(win){const dg=typeof DG!=='undefined'&&DG.on,fl=dg?DG.f:0,ch=room?chOf(room):1;_srS(win);
+  const bs=[...ovStats.querySelectorAll('b')].map(b=>b.textContent);
+  RES={win,rank:bs[0]||'-',time:fmtT(Math.floor(runTime)),combo:maxCombo,dmg:Math.round(dmgTaken),diff:DF().nm,ch,all:RUNALL,dg,fl,gear:!!RUNGEAR,nick:(typeof AUTH!=='undefined'&&AUTH.nick)||(()=>{try{return localStorage.getItem('ash_name')}catch(e){return null}})()||'이름 없는 검사'};
+  $('shareBtn').hidden=false};
+document.querySelector('#ov .ovrow').insertAdjacentHTML('beforeend','<button type="button" id="shareBtn" hidden>📸 결과 공유</button>');
+document.head.insertAdjacentHTML('beforeend',`<style>#shareBtn{background:#2a2238;color:#ffd27a;border:1px solid #c9a04a;border-radius:999px;padding:7px 16px;font-size:14px}
+#shOv{position:absolute;inset:0;z-index:47;background:rgba(4,2,8,.86);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2cqh}
+#shOv img{height:66%;border-radius:1.6cqh;box-shadow:0 2cqh 6cqh rgba(0,0,0,.6)}#shOv .row{display:flex;gap:1.6cqh}
+#shOv button{border:0;border-radius:1.4cqh;padding:1.4cqh 4cqh;font-size:3cqh;font-family:inherit;color:#fff;background:linear-gradient(#e8433a,#9a1420)}#shOv button.s{background:#2a2238;border:1px solid #4a3e5c;color:#cfc6dc}
+#shOv small{color:#a89cb8;font-size:2.4cqh}</style>`);
+STG.insertAdjacentHTML('beforeend',`<div id="shOv" hidden><img id="shImg" alt="결과 카드"><div class="row"><button type="button" id="shGo">공유하기</button><button type="button" class="s" id="shSave">이미지 저장</button><button type="button" class="s" id="shX">닫기</button></div><small>사진을 길게 눌러도 저장할 수 있어요</small></div>`);
+const ldI=src=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=src});
+async function makeCard(){const R=RES,S=1080,c=document.createElement('canvas');c.width=c.height=S;const g=c.getContext('2d');
+  try{await document.fonts.load('80px "Black Han Sans"');await document.fonts.load('40px Jua')}catch(e){}
+  const C=CHAPTERS[(R.ch||1)-1]||CHAPTERS[0],bgI=await ldI(R.dg?LOBBY_ART:(IMG[C.bg]?IMG[C.bg].src:LOBBY_ART)),kI=await ldI(KAEL_CUT);
+  g.fillStyle='#0b0910';g.fillRect(0,0,S,S);
+  if(bgI){const sc=Math.max(S/bgI.width,S/bgI.height);g.globalAlpha=.55;g.drawImage(bgI,(S-bgI.width*sc)/2,(S-bgI.height*sc)/2,bgI.width*sc,bgI.height*sc);g.globalAlpha=1}
+  let gr=g.createLinearGradient(0,0,S,0);gr.addColorStop(0,'rgba(6,4,12,0)');gr.addColorStop(.42,'rgba(6,4,12,.35)');gr.addColorStop(1,'rgba(6,4,12,.92)');g.fillStyle=gr;g.fillRect(0,0,S,S);
+  gr=g.createLinearGradient(0,S*0.6,0,S);gr.addColorStop(0,'rgba(6,4,12,0)');gr.addColorStop(1,'rgba(6,4,12,.9)');g.fillStyle=gr;g.fillRect(0,0,S,S);
+  if(kI){const kh=S*0.98,kw=kh*kI.width/kI.height;g.save();g.shadowColor='rgba(0,0,0,.7)';g.shadowBlur=40;g.drawImage(kI,-60,S-kh+30,kw,kh);g.restore()}
+  const X=520,T=(t,x,y,f,col,sw,al)=>{g.font=f;g.textAlign=al||'left';g.lineJoin='round';if(sw){g.strokeStyle='rgba(0,0,0,.85)';g.lineWidth=sw;g.strokeText(t,x,y)}g.fillStyle=col;g.fillText(t,x,y)};
+  T('잿빛',X,140,'92px "Black Han Sans",sans-serif','#f3e3bf',10);T('검사',X+g.measureText('잿빛 ').width+8,140,'92px "Black Han Sans",sans-serif','#e8433a',10);
+  const head=R.dg?`아이템 던전 ${R.fl}층`:R.all?'전체 도전':`${C.n}장 · ${C.nm}`;T(head,X,212,'44px "Black Han Sans"','#ffd27a',6);
+  T(`${R.diff}${R.gear?' · 성장':''}`,X,262,'34px Jua','#cfc6dc',5);
+  const rc={SSS:'#ffd27a',SS:'#ffb07a',S:'#ff8a6a'}[R.rank]||'#cfe4ff';g.font='110px "Black Han Sans",sans-serif';const rw=g.measureText(R.rank).width;T(R.rank,S-60,380,'110px "Black Han Sans",sans-serif',rc,10,'right');
+  const room2=S-60-rw-30-X;let fs=110;g.font=fs+'px "Black Han Sans",sans-serif';const lab=R.win?'CLEAR':'FAILED';while(g.measureText(lab).width>room2&&fs>40){fs-=4;g.font=fs+'px "Black Han Sans",sans-serif'}
+  T(lab,X,380,fs+'px "Black Han Sans",sans-serif',R.win?'#ffffff':'#ff7a6a',10);
+  const rows=[['클리어 시간',R.time],['최대 콤보',R.combo+' HIT'],['받은 피해',R.dmg.toLocaleString()]];
+  rows.forEach(([k,v],i)=>{const y=470+i*96;g.fillStyle='rgba(16,12,24,.78)';g.beginPath();g.roundRect(X,y-58,S-X-60,80,18);g.fill();g.strokeStyle='rgba(201,160,74,.6)';g.lineWidth=2;g.stroke();
+    T(k,X+28,y-6,'32px Jua','#a89cb8');T(v,S-90,y-4,'50px "Black Han Sans"','#ffffff',0,'right')});
+  T(R.nick,X,820,'46px "Black Han Sans"','#ffffff',6);
+  T('나보다 잘할 수 있어? 도전해 봐!',X,880,'32px Jua','#ffd27a',5);
+  g.fillStyle='#c8202a';g.beginPath();g.roundRect(X,920,S-X-60,92,46);g.fill();T('ashen-blade.github.io',X+(S-X-60)/2,980,'38px "Black Han Sans"','#ffffff',0,'center');
+  return c}
+let shBlob=null;
+$('shareBtn').addEventListener('click',async()=>{if(!RES)return;sfx('ui');const c=await makeCard();c.toBlob(b=>{shBlob=b;$('shImg').src=URL.createObjectURL(b);$('shOv').hidden=false},'image/png')});
+$('shX').addEventListener('click',()=>$('shOv').hidden=true);
+function shSave(){if(!shBlob)return;const a=document.createElement('a');a.href=URL.createObjectURL(shBlob);a.download='잿빛검사_결과.png';document.body.appendChild(a);a.click();a.remove()}
+$('shSave').addEventListener('click',shSave);
+$('shGo').addEventListener('click',async()=>{if(!shBlob)return;const f=new File([shBlob],'ashen_blade.png',{type:'image/png'}),txt=`잿빛 검사에서 ${RES.time}에 클리어! 나보다 잘할 수 있어? 👉 https://ashen-blade.github.io/`;
+  try{if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],text:txt});return}if(navigator.share){await navigator.share({text:txt,url:'https://ashen-blade.github.io/'});return}}catch(e){if(e&&e.name==='AbortError')return}
+  try{await navigator.clipboard.writeText(txt);toast('공유 문구를 복사했어요! 이미지는 저장해서 같이 보내 주세요')}catch(e){}shSave()});
+for(const id of ['ovHome','ovBtn'])$(id).addEventListener('click',()=>{$('shareBtn').hidden=true;$('shOv').hidden=true});
 // ===================== Google login (Supabase Auth over plain REST) + cloud save =====================
 const AUTH={at:null,rt:null,exp:0,uid:null,nick:null,email:null,busy:false};
 const AK='ash_auth';
