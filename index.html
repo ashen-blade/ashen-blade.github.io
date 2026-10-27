@@ -2598,11 +2598,15 @@ function drawUltWorld(){const p=player;if(!p)return;const on=p.move==='skE'&&p.m
     if(k<0.5){ctx.globalCompositeOperation='source-over';ctx.textAlign='center';ctx.globalAlpha=1-k*2;ctx.font='italic 120px "Black Han Sans", sans-serif';ctx.shadowColor='rgba(120,190,255,1)';ctx.shadowBlur=30;outlined('斬',cx,cy+44,'#ffffff',10);ctx.shadowBlur=0}}
   ctx.restore()}
 const _dfxU=drawFxLayer;drawFxLayer=function(front){_dfxU(front);if(front)drawUltWorld()};
-const KANIM_A1={frames:[{"w": 110, "h": 158, "ax": 43.1, "ay": 148.5, "x": 0}, {"w": 151, "h": 206, "ax": 79.1, "ay": 204.4, "x": 112}, {"w": 117, "h": 182, "ax": 42.4, "ay": 179.6, "x": 265}, {"w": 211, "h": 111, "ax": 75.4, "ay": 106.1, "x": 384}, {"w": 186, "h": 128, "ax": 45.8, "ay": 126.8, "x": 597}, {"w": 111, "h": 158, "ax": 44.2, "ay": 148.5, "x": 785}],src:'a/b70399d004eb.webp'};
+const KANIM_SRC={};
+KANIM_SRC.a1={frames:[{"w": 109, "h": 156, "ax": 41.3, "ay": 148.5, "x": 0}, {"w": 150, "h": 205, "ax": 81.1, "ay": 204.0, "x": 111}, {"w": 116, "h": 181, "ax": 46.2, "ay": 179.4, "x": 263}, {"w": 210, "h": 111, "ax": 67.4, "ay": 106.4, "x": 381}, {"w": 185, "h": 127, "ax": 44.7, "ay": 126.9, "x": 593}, {"w": 110, "h": 156, "ax": 42.4, "ay": 148.5, "x": 780}],src:'a/d3b3be4ec980.webp'};
+KANIM_SRC.a2={frames:[{"w": 175, "h": 137, "ax": 59.5, "ay": 134.1, "x": 0}, {"w": 154, "h": 128, "ax": 58.3, "ay": 127.7, "x": 177}, {"w": 168, "h": 193, "ax": 50.7, "ay": 192.8, "x": 333}, {"w": 155, "h": 234, "ax": 46.7, "ay": 233.1, "x": 503}, {"w": 131, "h": 184, "ax": 50.3, "ay": 183.2, "x": 660}, {"w": 118, "h": 156, "ax": 45.5, "ay": 148.5, "x": 793}],src:'a/c7390322e5e5.webp'};
+KANIM_SRC.a3={frames:[{"w": 153, "h": 148, "ax": 71.6, "ay": 146.7, "x": 0}, {"w": 134, "h": 144, "ax": 62.1, "ay": 140.0, "x": 155}, {"w": 222, "h": 141, "ax": 54.9, "ay": 140.8, "x": 291}, {"w": 250, "h": 130, "ax": 60.3, "ay": 127.4, "x": 515}, {"w": 233, "h": 125, "ax": 74.7, "ay": 121.0, "x": 767}, {"w": 138, "h": 154, "ax": 57.2, "ay": 148.5, "x": 1002}],src:'a/de39ab0440cf.webp'};
+KANIM_SRC.a4={frames:[{"w": 143, "h": 112, "ax": 80.4, "ay": 111.6, "x": 0}, {"w": 138, "h": 100, "ax": 72.4, "ay": 101.2, "x": 145}, {"w": 170, "h": 174, "ax": 57.7, "ay": 174.5, "x": 285}, {"w": 140, "h": 221, "ax": 42.1, "ay": 220.9, "x": 457}, {"w": 96, "h": 282, "ax": 38.3, "ay": 281.9, "x": 599}, {"w": 191, "h": 113, "ax": 64.8, "ay": 111.6, "x": 697}, {"w": 112, "h": 155, "ax": 47.3, "ay": 148.5, "x": 890}],src:'a/d42f7ef554b8.webp'};
 // ===================== hand-drawn frame animation for Kael (replaces the rig for selected moves) =====================
-loadImg('ka1',KANIM_A1.src);
-// move -> [frame set, image key, frame end-times (seconds into the move)]
-const KANIM={a1:{F:KANIM_A1.frames,img:'ka1',t:[.035,.075,.1,.2,.27,9]}};
+// move -> frame set + frame end-times (seconds into the move); hit frames line up with MOVES[m].hits
+const KANIM={a1:{t:[.035,.075,.1,.2,.27,9]},a2:{t:[.03,.065,.1,.2,.27,9]},a3:{t:[.04,.08,.12,.22,.29,9]},a4:{t:[.05,.1,.16,.22,.32,.42,9]}};
+for(const m in KANIM){const S=KANIM_SRC[m];if(!S){delete KANIM[m];continue}KANIM[m].F=S.frames;KANIM[m].img='ka_'+m;loadImg('ka_'+m,S.src)}
 function kanimFrame(A,mt){for(let i=0;i<A.t.length;i++)if(mt<A.t[i])return i;return A.t.length-1}
 const _dhcK=drawHeroCut;drawHeroCut=function(e,P,o){o=o||{};const A=e.move&&KANIM[e.move],im=A&&IMG[A.img];
   if(!A||!im||o.stick||e.st!=='move'){return _dhcK(e,P,o)}
