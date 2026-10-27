@@ -2613,6 +2613,11 @@ KANIM_SRC.skW={frames:[{"w": 145, "h": 200, "ax": 53.6, "ay": 199.3, "air": 0, "
 KANIM_SRC.skS={frames:[{"w": 166, "h": 149, "ax": 71.2, "ay": 146.0, "air": 0, "x": 0}, {"w": 188, "h": 143, "ax": 94.6, "ay": 140.9, "air": 0, "x": 168}, {"w": 279, "h": 140, "ax": 65.1, "ay": 136.8, "air": 0, "x": 358}, {"w": 190, "h": 140, "ax": 68.7, "ay": 136.3, "air": 0, "x": 639}, {"w": 283, "h": 131, "ax": 84.4, "ay": 126.6, "air": 0, "x": 831}, {"w": 141, "h": 154, "ax": 60.5, "ay": 148.5, "air": 0, "x": 1116}],src:'a/416a27f92ab6.webp'};
 KANIM_SRC.skQ={frames:[{"w": 154, "h": 195, "ax": 74.7, "ay": 194.7, "air": 1, "x": 0}, {"w": 170, "h": 160, "ax": 76.1, "ay": 159.7, "air": 1, "x": 156}, {"w": 170, "h": 234, "ax": 89.2, "ay": 159.2, "air": 1, "x": 328}, {"w": 167, "h": 122, "ax": 84.1, "ay": 121.4, "air": 0, "x": 500}, {"w": 154, "h": 170, "ax": 63.0, "ay": 169.0, "air": 0, "x": 669}],src:'a/f45dd2b9c13c.webp'};
 KANIM_SRC.skE={frames:[{"w": 148, "h": 265, "ax": 58.8, "ay": 264.4, "air": 0, "x": 0}, {"w": 280, "h": 122, "ax": 66.3, "ay": 121.5, "air": 0, "x": 150}, {"w": 278, "h": 131, "ax": 77.6, "ay": 131.0, "air": 0, "x": 432}, {"w": 135, "h": 148, "ax": 68.3, "ay": 148.5, "air": 0, "x": 712}],src:'a/4ac74623765c.webp'};
+KANIM_SRC.dash={frames:[{"w": 186, "h": 121, "ax": 100.5, "ay": 119.9, "air": 0, "x": 0}, {"w": 231, "h": 119, "ax": 139.2, "ay": 117.5, "air": 0, "x": 188}, {"w": 268, "h": 109, "ax": 167.8, "ay": 107.9, "air": 0, "x": 421}, {"w": 225, "h": 150, "ax": 130.5, "ay": 148.4, "air": 0, "x": 691}],src:'a/f373646bffd3.webp'};
+KANIM_SRC.jump={frames:[{"w": 107, "h": 123, "ax": 49.5, "ay": 122.3, "air": 0, "x": 0}, {"w": 112, "h": 146, "ax": 40.8, "ay": 145.2, "air": 1, "x": 109}, {"w": 117, "h": 132, "ax": 61.8, "ay": 131.3, "air": 1, "x": 223}, {"w": 122, "h": 167, "ax": 99.9, "ay": 166.3, "air": 0, "x": 342}, {"w": 121, "h": 120, "ax": 54.3, "ay": 120.0, "air": 0, "x": 466}],src:'a/2621f166e9fe.webp'};
+KANIM_SRC.air={frames:[{"w": 106, "h": 146, "ax": 48.8, "ay": 145.7, "air": 0, "x": 0}, {"w": 110, "h": 143, "ax": 58.3, "ay": 142.4, "air": 0, "x": 108}, {"w": 212, "h": 103, "ax": 36.0, "ay": 102.5, "air": 1, "x": 220}, {"w": 164, "h": 118, "ax": 57.0, "ay": 94.3, "air": 1, "x": 434}, {"w": 123, "h": 128, "ax": 99.5, "ay": 128.0, "air": 0, "x": 600}],src:'a/b2a418816486.webp'};
+KANIM_SRC.hurt={frames:[{"w": 222, "h": 142, "ax": 109.1, "ay": 141.9, "air": 0, "x": 0}, {"w": 222, "h": 135, "ax": 115.0, "ay": 134.2, "air": 0, "x": 224}, {"w": 217, "h": 137, "ax": 69.9, "ay": 136.9, "air": 0, "x": 448}],src:'a/f034d70c44e0.webp'};
+KANIM_SRC.down={frames:[{"w": 136, "h": 159, "ax": 78.3, "ay": 157.8, "air": 1, "x": 0}, {"w": 141, "h": 106, "ax": 63.2, "ay": 105.5, "air": 0, "x": 138}, {"w": 182, "h": 51, "ax": 94.6, "ay": 50.4, "air": 0, "x": 281}, {"w": 121, "h": 67, "ax": 62.0, "ay": 66.7, "air": 0, "x": 465}, {"w": 114, "h": 113, "ax": 52.3, "ay": 112.1, "air": 0, "x": 588}, {"w": 116, "h": 155, "ax": 55.4, "ay": 148.5, "air": 0, "x": 704}],src:'a/96522ba62468.webp'};
 // ===================== hand-drawn frame animation for Kael (replaces the rig for selected moves) =====================
 // move -> frame set + frame end-times (seconds into the move); hit frames line up with MOVES[m].hits
 const KANIM={a1:{t:[.035,.075,.1,.2,.27,9]},a2:{t:[.03,.065,.1,.2,.27,9]},a3:{t:[.04,.08,.12,.22,.29,9]},a4:{t:[.05,.1,.16,.22,.32,.42,9]},
@@ -2623,6 +2628,7 @@ const KANIM={a1:{t:[.035,.075,.1,.2,.27,9]},a2:{t:[.03,.065,.1,.2,.27,9]},a3:{t:
   skF:{seq:[[.06,0],[.18,1],[.3,2],[.43,3],[.6,4],[.7,5],[9,6]]},
   skQ:{seq:[[.08,0],[.16,1],[.62,2],[.76,3],[9,4]]},
   skW:{seq:[[.06,0],[.12,1],[.22,2],[.32,3],[9,4]]},
+  air:{seq:[[.05,0],[.1,1],[.17,2],[.26,3],[9,4]]},
   skE:{seq:[[.75,0],[.9,1],[1.05,2],[1.2,1],[1.35,2],[1.5,1],[1.62,2],[9,3]]}};
 for(const m in KANIM){const S=KANIM_SRC[m];if(!S){delete KANIM[m];continue}KANIM[m].F=S.frames;KANIM[m].img='ka_'+m;loadImg('ka_'+m,S.src)}
 function kanimFrame(A,mt){if(A.loop){const n=A.F.length;return mt>=A.end[0]?A.end[1]:Math.floor(mt/A.loop)%n}
@@ -2630,11 +2636,19 @@ function kanimFrame(A,mt){if(A.loop){const n=A.F.length;return mt>=A.end[0]?A.en
   for(let i=0;i<A.t.length;i++)if(mt<A.t[i])return i;return A.t.length-1}
 // looping states: frame chosen from the walk phase (one stride = 2π) or the clock
 const KLOOP={};for(const m of ['idle','walk','run']){const S=KANIM_SRC[m];if(S){KLOOP[m]={F:S.frames,img:'kl_'+m};loadImg('kl_'+m,S.src)}}
+for(const m of ['dash','jump','hurt','down']){const S=KANIM_SRC[m];if(S){KLOOP[m]={F:S.frames,img:'kl_'+m};loadImg('kl_'+m,S.src)}}
+function kstateFrame(e){const st=e.st,G=m=>{const L=KLOOP[m],im=L&&IMG[L.img];return im?[L,im]:null};let r,k;
+  if(st==='back'&&(r=G('dash')))k=clamp(Math.floor((0.3-e.t)/0.3*4),0,3);
+  else if(st==='jump'&&(r=G('jump')))k=e.vz>260?1:e.vz>-120?2:e.z>40?3:4;
+  else if(st==='hurt'&&(r=G('hurt')))k=e.grab?Math.floor(time*6)%2:clamp(Math.floor((0.32-e.stun)/0.32*3),0,2);
+  else if(st==='down'&&(r=G('down')))k=e.z>1?(e.vz>0?0:1):2;
+  else if(st==='getup'&&(r=G('down')))k=3+clamp(Math.floor((0.38-e.t)/0.38*3),0,2);
+  else return null;return [r[0].F[k],r[1]]}
 function kloopFrame(e){const st=e.st==='idle'||e.st==='walk'||e.st==='run'?e.st:null;if(!st||(e.z||0)>1)return null;const L=KLOOP[st],im=L&&IMG[L.img];if(!im)return null;
   const n=L.F.length,k=st==='idle'?Math.floor(time*5)%n:Math.floor(((e.walk||0)/(Math.PI*2))*n)%n;return [L.F[(k+n)%n],im]}
 const _dhcK=drawHeroCut;drawHeroCut=function(e,P,o){o=o||{};const A=e.move&&KANIM[e.move],imA=A&&IMG[A.img];let f,im;
   if(A&&imA&&!o.stick&&e.st==='move'){f=A.F[kanimFrame(A,e.mt||0)];im=imA}
-  else if(!o.stick&&e===player){const r=kloopFrame(e);if(r){[f,im]=r}}
+  else if(!o.stick&&e===player){const r=kstateFrame(e)||kloopFrame(e);if(r){[f,im]=r}}
   if(!f)return _dhcK(e,P,o);ctx.save();ctx.scale(e.face,1);
   ctx.drawImage(im,f.x,0,f.w,f.h,-f.ax,-f.ay,f.w,f.h);
   if(o.tint||e.hitF>0){ctx.globalCompositeOperation='lighter';ctx.globalAlpha=o.tint?0.5:0.6;ctx.drawImage(im,f.x,0,f.w,f.h,-f.ax,-f.ay,f.w,f.h)}
