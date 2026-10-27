@@ -2598,6 +2598,18 @@ function drawUltWorld(){const p=player;if(!p)return;const on=p.move==='skE'&&p.m
     if(k<0.5){ctx.globalCompositeOperation='source-over';ctx.textAlign='center';ctx.globalAlpha=1-k*2;ctx.font='italic 120px "Black Han Sans", sans-serif';ctx.shadowColor='rgba(120,190,255,1)';ctx.shadowBlur=30;outlined('斬',cx,cy+44,'#ffffff',10);ctx.shadowBlur=0}}
   ctx.restore()}
 const _dfxU=drawFxLayer;drawFxLayer=function(front){_dfxU(front);if(front)drawUltWorld()};
+const KANIM_A1={frames:[{"w": 110, "h": 158, "ax": 43.1, "ay": 148.5, "x": 0}, {"w": 151, "h": 206, "ax": 79.1, "ay": 204.4, "x": 112}, {"w": 117, "h": 182, "ax": 42.4, "ay": 179.6, "x": 265}, {"w": 211, "h": 111, "ax": 75.4, "ay": 106.1, "x": 384}, {"w": 186, "h": 128, "ax": 45.8, "ay": 126.8, "x": 597}, {"w": 111, "h": 158, "ax": 44.2, "ay": 148.5, "x": 785}],src:'a/b70399d004eb.webp'};
+// ===================== hand-drawn frame animation for Kael (replaces the rig for selected moves) =====================
+loadImg('ka1',KANIM_A1.src);
+// move -> [frame set, image key, frame end-times (seconds into the move)]
+const KANIM={a1:{F:KANIM_A1.frames,img:'ka1',t:[.035,.075,.1,.2,.27,9]}};
+function kanimFrame(A,mt){for(let i=0;i<A.t.length;i++)if(mt<A.t[i])return i;return A.t.length-1}
+const _dhcK=drawHeroCut;drawHeroCut=function(e,P,o){o=o||{};const A=e.move&&KANIM[e.move],im=A&&IMG[A.img];
+  if(!A||!im||o.stick||e.st!=='move'){return _dhcK(e,P,o)}
+  const f=A.F[kanimFrame(A,e.mt||0)];ctx.save();ctx.scale(e.face,1);
+  ctx.drawImage(im,f.x,0,f.w,f.h,-f.ax,-f.ay,f.w,f.h);
+  if(o.tint||e.hitF>0){ctx.globalCompositeOperation='lighter';ctx.globalAlpha=o.tint?0.5:0.6;ctx.drawImage(im,f.x,0,f.w,f.h,-f.ax,-f.ay,f.w,f.h)}
+  ctx.restore();if(e===player)e._hand=[[(f.w-f.ax)*0.7,-f.ay*0.45],0.3]};
 </script>
 
 </body></html>
