@@ -2060,7 +2060,7 @@ function applyPB(on){const t=on?gearStats():ZS();PB.atk=1+t.atk/100;PB.crit=Math
 for(const it of SAVE.inv||[]){if(!it.il)it.il=1;if(!it.op)it.op=[]}
 if(!SAVE.inv){SAVE.inv=[newItem('w',0),newItem('a',0),newItem('c',0)];saveNow()}
 function addItem(it){if(SAVE.inv.length>=INV_MAX){const v=dismantleVal(it);SAVE.ash+=v.ash;SAVE.stone+=v.stone;SAVE.cry+=v.cry;return false}SAVE.inv.push(it);return true}
-const GOD=f=>{const L=Math.min(.05,.004*Math.max(0,f-2)),E=Math.min(.18,.02+.012*f),R=Math.min(.38,.18+.02*f);return [1-L-E-R,R,E,L]};
+const GOD=f=>{const L=f<10?0:Math.min(.01,.005+.001*(f-10)),E=Math.min(.18,.02+.012*f),R=Math.min(.38,.18+.02*f);return [1-L-E-R,R,E,L]};
 function rollGrade(f,minG){const L=GOD(f)[3],E=GOD(f)[2],R=GOD(f)[1],x=Math.random();let g=x<L?3:x<L+E?2:x<L+E+R?1:0;return Math.max(g,minG||0)}
 function rollItem(f,minG){const s=['w','a','c'][Math.floor(Math.random()*3)];return newItem(s,rollGrade(f,minG),f)}
 const ENH_MAX=20;
