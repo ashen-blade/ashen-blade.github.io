@@ -1597,16 +1597,17 @@ async function rkShow(diff,stage,gear){if(stage==null)stage=rkStage;if(gear==nul
   catch(e){if(rkTab+'/'+rkStage+'/'+rkGear+'/'+rkWeek===key)L.innerHTML=OFFSITE?'<li class="empty">랭킹은 ashen-blade.github.io 에서만 볼 수 있어요.</li>':'<li class="empty">랭킹을 불러오지 못했어요. 인터넷 연결을 확인해 주세요.</li>'}}
 function rkOpen(diff,stage,gear){rkEl('rkPanel').hidden=false;rkShow(diff==null?diffI:diff,stage,gear==null?rkGear:gear)}
 function rkOffer(recs){rkPending=recs;rkMine=[];const box=rkEl('rkSubmit'),inp=rkEl('rkName'),btn=rkEl('rkSend');box.hidden=false;btn.disabled=false;rkEl('rkMsg').textContent='등록될 기록: '+recs.map(r=>STG_NM[r.stage]+' '+fmtT(r.time_sec)).join(' · ');
-  try{inp.value=localStorage.getItem('ash_name')||''}catch(e){}const nk=RKA.nick();inp.hidden=!!nk;if(nk){btn.textContent=`${nk}(으)로 랭킹 등록`;btn.focus()}else{btn.textContent='랭킹 등록';inp.focus();setTimeout(()=>{if(!box.hidden)inp.focus()},80)}if(RKA.onOffer)RKA.onOffer()}
+  try{inp.value=localStorage.getItem('ash_name')||''}catch(e){}const nk=RKA.nick();inp.hidden=!!nk;if(nk){btn.textContent=`${nk}(으)로 랭킹 등록`;btn.focus()}else{btn.textContent='랭킹 등록';inp.focus();setTimeout(()=>{if(!box.hidden)inp.focus()},80)}if(RKA.onOffer)RKA.onOffer();if(nk&&!RKA.need()){rkAuto=1;btn.disabled=true;rkEl('rkMsg').textContent='랭킹에 자동 등록 중…';setTimeout(rkSubmit,250)}}
+let rkAuto=0,rkLast=null;
 const rankOffer=rkOffer;
 let RKA={hdr:()=>({}),nick:()=>null,need:()=>false};
 async function rkSubmit(){const inp=rkEl('rkName'),btn=rkEl('rkSend'),msg=rkEl('rkMsg'),name=(RKA.nick()||inp.value.trim()).slice(0,12);if(RKA.need()){msg.textContent='랭킹 등록은 구글 로그인 후에 할 수 있어요.';RKA.login&&RKA.login();return}
-  if(!rkPending)return;if(!name){msg.textContent='닉네임을 입력해 주세요.';inp.focus();return}
+  if(!rkPending){if(rkLast){rkOpen(...rkLast)}return}if(!name){msg.textContent='닉네임을 입력해 주세요.';inp.focus();return}
   btn.disabled=true;msg.textContent='등록 중…';try{localStorage.setItem('ash_name',name)}catch(e){}
   try{await (RKA.ready?RKA.ready():0);const r=await fetch(`${SB_URL}/rest/v1/scores`,{method:'POST',headers:Object.assign({Prefer:'return=representation'},RKH,RKA.hdr()),body:JSON.stringify(rkPending.map(x=>Object.assign({name},x)))});
     if(!r.ok)throw new Error('HTTP '+r.status);const j=await r.json();rkMine=(j||[]).map(x=>x.id);
-    const d=rkPending[0].diff,gr=rkPending[0].gear?1:0,st=rkPending.some(x=>x.stage===0)?0:Math.max(...rkPending.map(x=>x.stage));rkPending=null;rkEl('rkSubmit').hidden=true;rkOpen(d,st,gr)}
-  catch(e){btn.disabled=false;msg.textContent=OFFSITE?'여기선 랭킹이 안 돼요! ashen-blade.github.io 에서 플레이해 주세요.':'등록에 실패했어요. 잠시 후 다시 눌러 주세요.'}}
+    const d=rkPending[0].diff,gr=rkPending[0].gear?1:0,st=rkPending.some(x=>x.stage===0)?0:Math.max(...rkPending.map(x=>x.stage));rkPending=null;rkLast=[d,st,gr];if(rkAuto){rkAuto=0;msg.textContent='✔ 랭킹에 자동 등록했어요!';btn.textContent='🏆 랭킹 보기';btn.disabled=false;inp.hidden=true;sfx('ready',true)}else{rkEl('rkSubmit').hidden=true;rkOpen(d,st,gr)}}
+  catch(e){rkAuto=0;btn.textContent='다시 등록';btn.disabled=false;msg.textContent=OFFSITE?'여기선 랭킹이 안 돼요! ashen-blade.github.io 에서 플레이해 주세요.':'등록에 실패했어요. 잠시 후 다시 눌러 주세요.'}}
 rkEl('rkSend').addEventListener('click',rkSubmit);
 rkEl('rkName').addEventListener('keydown',e=>{e.stopPropagation();if(e.key==='Enter'&&!e.isComposing&&e.keyCode!==229){e.preventDefault();setTimeout(rkSubmit,30)}});
 rkEl('rkName').addEventListener('keyup',e=>e.stopPropagation());
@@ -1617,7 +1618,7 @@ document.querySelectorAll('[data-st]').forEach(b=>b.addEventListener('click',()=
 document.querySelectorAll('[data-gr]').forEach(b=>b.addEventListener('click',()=>rkShow(rkTab,rkStage,+b.dataset.gr)));
 document.querySelectorAll('[data-pd]').forEach(b=>b.addEventListener('click',()=>{rkWeek=+b.dataset.pd;rkShow(rkTab,rkStage,rkGear)}));
 // hide submit box whenever a new run starts
-ovBtn.addEventListener('click',()=>{rkEl('rkSubmit').hidden=true;rkEl('rkPanel').hidden=true;rkPending=null});
+ovBtn.addEventListener('click',()=>{rkEl('rkSubmit').hidden=true;rkEl('rkPanel').hidden=true;rkPending=null;rkLast=null;rkAuto=0});
 
 // ---------- anonymous visit counter (no personal data) ----------
 const VID=(()=>{let v=null;try{v=localStorage.getItem('ash_vid')}catch(e){}if(!v){v=(crypto.randomUUID?crypto.randomUUID():String(Math.random()).slice(2)+Date.now()).replace(/-/g,'').slice(0,24);try{localStorage.setItem('ash_vid',v)}catch(e){}}return v})();
