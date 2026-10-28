@@ -477,7 +477,7 @@ const MOVES={
   skF:{nm:'대지 가르기',key:'F',mp:15,cd:7,dur:.82,hits:[{t:.43,d:.07,off:-140,w:280,dy:60,dmg:[700,800],stun:.7,kz:380,bounce:1,otg:1,hs:.11,big:1,zr:[-20,200]}],slam:1,sfx:'sk_slam'},
   skW:{nm:'검기 파동',key:'W',mp:14,cd:6,dur:.46,hits:[],wave:.14,sfx:'sk_wave'},
   skQ:{nm:'낙화참',key:'Q',mp:10,cd:4,dur:.9,hits:[],dive:1,sfx:'sk_dive'},
-  skE:{nm:'천열참',key:'E',mp:55,cd:40,dur:2.15,hits:[],ult:1,sfx:'ult_in'},
+  skE:{nm:'천열참',key:'E',mp:80,cd:60,dur:2.15,hits:[],ult:1,sfx:'ult_in'},
 };
 const SKILLS=['skA','skS','skD','skF','skQ','skW','skE'];
 const SKILLKEY={skA:'A',skS:'S',skD:'Dk',skF:'F',skQ:'Q',skW:'W',skE:'E'};
@@ -609,23 +609,23 @@ function moveUpdate(dt){
 function ultUpdate(t,t0){const p=player;
   if(t>=0.75&&t<1.6){const k=Math.floor((t-0.75)/0.085),k0=Math.floor((t0-0.75)/0.085);if(t0<0.75||k!==k0){
     const vis=mons.filter(e=>canHit(e)&&e.x>camX-40&&e.x<camX+W+40);
-    for(const e of vis){{const u=DF().ult*(e.type==='boss'?0.6:1)*ULTM;applyHit(e,{dmg:[200*u,240*u],stun:.5,kz:e.z>1?200:0,hs:0.02},p,{ult:1})}if(vis.length)sfx('ult_slash');
+    for(const e of vis){{const u=DF().ult*(e.type==='boss'?0.45:1)*ULTM;applyHit(e,{dmg:[110*u,135*u],stun:.5,kz:e.z>1?200:0,hs:0.02},p,{ult:1})}if(vis.length)sfx('ult_slash');
       const a=rnd(0,Math.PI*2);fxs.push({k:'line',x:e.x,y:e.y,z:e.z+50,a,len:rnd(180,280),t:0.18,m:0.18});if(Math.random()<0.5)spr(Math.random()<0.5?0:6,e.x,e.y,e.z+55,{face:Math.random()<0.5?1:-1,rot:rnd(-1,1),sc:rnd(0.4,0.6),t:0.16})}
     if(vis.length){const e=vis[Math.floor(Math.random()*vis.length)];p.x=e.x+rnd(-90,90);p.y=e.y;p.face=e.x>p.x?1:-1}}}
   if(t>=1.62&&t0<1.62){const vis=mons.filter(e=>canHit(e)&&e.x>camX-40&&e.x<camX+W+40);
-    for(const e of vis){const u=DF().ult*(e.type==='boss'?0.6:1)*ULTM*ULTF;applyHit(e,{dmg:[1300*u,1500*u],stun:.8,kz:560,hs:0.16,big:1,otg:1},p,{ult:1});ringFx(e.x,e.y,160,'255,230,160');spr(6,e.x,e.y,e.z+60,{sc:1.1,t:0.45});spr(7,e.x,e.y,e.z+60,{sc:0.9,t:0.3})}
+    for(const e of vis){const u=DF().ult*(e.type==='boss'?0.45:1)*ULTM*ULTF;applyHit(e,{dmg:[780*u,900*u],stun:.8,kz:560,hs:0.16,big:1,otg:1},p,{ult:1});ringFx(e.x,e.y,160,'255,230,160');spr(6,e.x,e.y,e.z+60,{sc:1.1,t:0.45});spr(7,e.x,e.y,e.z+60,{sc:0.9,t:0.3})}
     flash=0.4;flashCol='255,250,230';shake=24;sfx('ult_end');dark=0}
 }
-function startDash(){const p=player,dx=(K.R?1:0)-(K.L?1:0),dy=(K.D?1:0)-(K.U?1:0);if(dx)p.face=dx;p.move=null;p.z=0;p.st='back';p.t=0.3;p.vx=p.face*560;p.vy=dy*170;p.inv=0.32;sfx('dash')}
+const DASH_CD=0.75;function startDash(){const p=player;if(time<(p.dashReady||0))return;p.dashReady=time+DASH_CD;const dx=(K.R?1:0)-(K.L?1:0),dy=(K.D?1:0)-(K.U?1:0);if(dx)p.face=dx;p.move=null;p.z=0;p.st='back';p.t=0.3;p.vx=p.face*560;p.vy=dy*170;p.inv=0.24;sfx('dash')}
 function hurtPlayer(d,kx,knock){const p=player;if(p.inv>0||p.st==='down'||p.st==='getup'||state!=='play'||(p.move&&MOVES[p.move].ult))return;
   d=Math.round(d*DIFFM()*PB.def*PB.emul);p.hp-=d;dmgTaken+=d;sfx('hurt');shake=Math.max(shake,8);flash=0.12;flashCol='255,40,40';addNum(p.x,p.y,p.z+120,d,-1);
   p.move=null;combo.n=combo.n;if(knock){p.st='down';p.t=0.75;p.vx=kx;p.vz=300;p.z=Math.max(p.z,1)}else{p.st='hurt';p.stun=0.32;p.vx=kx}
   if(p.hp<=0){p.hp=0;state='over';sfx('lose');setTimeout(()=>showResult(false),900)}}
 const DIFFS=[
-  {nm:'초급자',hp:.65,dmg:.5,cd:1.4,tok:1,spd:.85,ult:1.25,heal:.4,armor:.7,desc:'적이 약하고 느려요. 처음이라면 여기서!'},
+  {nm:'초급자',hp:.65,dmg:.5,cd:1.4,tok:1,spd:.85,ult:1.2,heal:.4,armor:.7,desc:'적이 약하고 느려요. 처음이라면 여기서!'},
   {nm:'중급자',hp:1,dmg:1,cd:1,tok:2,spd:1,ult:1,heal:.2,armor:1,desc:'기본 난이도. 콤보와 대쉬를 섞어야 해요.'},
-  {nm:'고급자',hp:1.4,dmg:1.5,cd:.75,tok:3,spd:1.1,ult:.85,heal:.1,armor:1.3,desc:'적이 단단하고 공격이 잦아요.'},
-  {nm:'마스터',hp:1.6,dmg:1.75,cd:.66,tok:3,spd:1.15,ult:.8,heal:.1,armor:1.4,desc:'적이 매우 강하고 회복이 거의 없어요. 한 번의 실수가 치명적.'}];
+  {nm:'고급자',hp:1.4,dmg:1.5,cd:.75,tok:3,spd:1.1,ult:.75,heal:.1,armor:1.3,desc:'적이 단단하고 공격이 잦아요.'},
+  {nm:'마스터',hp:1.6,dmg:1.75,cd:.66,tok:3,spd:1.15,ult:.6,heal:.1,armor:1.4,desc:'적이 매우 강하고 회복이 거의 없어요. 한 번의 실수가 치명적.'}];
 let diffI=1;try{const v=+localStorage.getItem('ash_diff');if(v>=0&&v<4)diffI=v}catch(e){}
 const DF=()=>DIFFS[diffI];const DIFFM=()=>DF().dmg;
 // ===================== painted assets (generated with Higgsfield) =====================
@@ -1768,7 +1768,7 @@ const TUTS=[
   {t:'공중 콤보',d:()=>KT('띄운 적이 떨어지기 전에 계속 때리기 (J, 점프+J)','띄운 적이 떨어지기 전에 계속 때리기'),n:4,k:'juggle'},
   {t:'스킬',d:()=>KT('I 돌진 · O 회오리 · P 대지 가르기 · H 검기 · N 낙화 — 3가지 써보기','[돌진] [회오리] [대지 가르기] [검기] [낙화] 중 3가지 써보기'),n:3,k:'skills'},
   {t:'스킬 캔슬',d:()=>KT('기본 공격 도중에 스킬을 누르면 끊김 없이 이어져요 (2번)','공격 도중에 스킬을 누르면 바로 이어져요 (2번)'),n:2,k:'cancel'},
-  {t:'각성기',d:()=>KT('SPACE [천열참] — 화면의 모든 적을 벱니다 (MP 55)','[각성] 버튼 — 화면의 모든 적을 벱니다 (MP 55)'),n:1,k:'ult'},
+  {t:'각성기',d:()=>KT('SPACE [천열참] — 화면의 모든 적을 벱니다 (MP 80)','[각성] 버튼 — 화면의 모든 적을 벱니다 (MP 80)'),n:1,k:'ult'},
   {t:'실전',d:()=>'산적 2마리를 처치하세요. 적이 공격 자세를 잡으면 대쉬로 피하기!',n:2,k:'kill',start:()=>{for(const e of mons)if(e.T.dummy)e.st='dead',e.t=0;mons=mons.filter(e=>!e.T.dummy);
     for(const x of [p0x()+380,p0x()+520]){const e=spawnEnemy('grunt',clamp(x,200,room.w-80));e.hp=e.max=Math.round(e.max*0.5);e.aggro=true}}},
 ];
@@ -1861,7 +1861,7 @@ const TITLES=['잿빛 성채의 견습 검사','잿빛 성채의 검사','혈월
 function paintHome(){let nm='';try{nm=localStorage.getItem('ash_name')||''}catch(e){}$('hName').textContent=nm||'이름 없는 검사';
   const lv=lvOf(SAVE.xp);$('hLv').textContent=lv;$('hTitle').textContent=TITLES[SAVE.prog.c2?3:SAVE.prog.c1?2:lv>=3?1:0];
   $('hAsh').textContent=Math.floor(SAVE.ash).toLocaleString();let seen=0;try{seen=+localStorage.getItem('ash_tut')}catch(e){}$('tutBtn').classList.toggle('new',!seen)}
-const LINES=['오늘도 잿빛 성채로 가나?','4연타 다음엔 올려베기. 떨어뜨리지 마.','대쉬하는 순간엔 아무것도 날 벨 수 없어.','고르둔… 그 도끼는 피하는 게 답이다.','혈월이 뜨는 밤엔 박쥐 소리가 유난히 크지.','잿가루가 쌓이면… 언젠가 쓸 데가 있겠지.','발라크에게 잡히면 J를 미친 듯이 눌러.','각성기는 아껴. 쿨타임이 40초나 되니까.'];
+const LINES=['오늘도 잿빛 성채로 가나?','4연타 다음엔 올려베기. 떨어뜨리지 마.','대쉬하는 순간엔 아무것도 날 벨 수 없어.','고르둔… 그 도끼는 피하는 게 답이다.','혈월이 뜨는 밤엔 박쥐 소리가 유난히 크지.','잿가루가 쌓이면… 언젠가 쓸 데가 있겠지.','발라크에게 잡히면 J를 미친 듯이 눌러.','각성기는 아껴. 쿨타임이 60초나 되니까.'];
 let bubT=0;
 $('hArt').addEventListener('click',()=>{const b=$('hBubble');b.querySelector('span').textContent=LINES[Math.floor(Math.random()*LINES.length)];b.hidden=false;b.style.animation='none';void b.offsetWidth;b.style.animation='';sfx('ui');clearTimeout(bubT);bubT=setTimeout(()=>b.hidden=true,3600)});
 function toast(t){const e=$('hToast');e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,1500)}
@@ -2669,6 +2669,8 @@ let FERR=0;const _frP=frame;frame=function(now){try{_frP(now)}catch(e){FERR++;if
 {const E=CanvasRenderingContext2D.prototype.ellipse;CanvasRenderingContext2D.prototype.ellipse=function(x,y,rx,ry,...a){return E.call(this,x,y,Math.max(0,rx||0),Math.max(0,ry||0),...a)};
  const A=CanvasRenderingContext2D.prototype.arc;CanvasRenderingContext2D.prototype.arc=function(x,y,r,...a){return A.call(this,x,y,Math.max(0,r||0),...a)};
  const RG=CanvasRenderingContext2D.prototype.createRadialGradient;CanvasRenderingContext2D.prototype.createRadialGradient=function(x0,y0,r0,x1,y1,r1){return RG.call(this,x0||0,y0||0,Math.max(0,r0||0),x1||0,y1||0,Math.max(0,r1||0))}}
+// dash cooldown shown on the touch button
+setInterval(()=>{const b=typeof PADB!=='undefined'&&PADB.Z;if(!b||!player)return;const r=(player.dashReady||0)-time;b.style.opacity=r>0?'.45':'';b.style.filter=r>0?'grayscale(1)':''},50);
 </script>
 
 </body></html>
