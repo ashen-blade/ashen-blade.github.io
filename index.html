@@ -2422,6 +2422,11 @@ $('bkGo').addEventListener('click',()=>{const L=bkList();if(!L.length)return;
   SAVE.ash+=t.ash;SAVE.stone+=t.stone;SAVE.cry+=t.cry;SAVE.inv=SAVE.inv.filter(x=>!del.has(x.u));if(iSel&&del.has(iSel))iSel=null;
   sfx('kill');saveNow();$('bkOv').hidden=true;paintInv();iMsg(`${L.length}개 분해 · 잿가루 +${t.ash.toLocaleString()}`,'#ffd27a')});
 $('iClose').addEventListener('click',()=>{$('bkOv').hidden=true});
+// ===================== adventure difficulty boost (item dungeon keeps its own scaling) =====================
+const DIFF_BASE=DIFFS.map(d=>Object.assign({},d));
+const ADV_UP={hp:1.3,dmg:1.3,cd:.85,spd:1.06,armor:1.2,heal:.75};
+function setAdvDiff(on){DIFFS.forEach((d,i)=>{const b=DIFF_BASE[i];for(const k in ADV_UP)d[k]=on?+(b[k]*ADV_UP[k]).toFixed(3):b[k];d.tok=on?Math.min(4,b.tok+1):b.tok})}
+const _sgAD=startGame;startGame=function(){setAdvDiff(!(typeof DG!=='undefined'&&DG.on));_sgAD()};
 // ===================== skill upgrades (spend 잿가루 / 강화석) =====================
 SAVE.sk=Object.assign({skA:0,skS:0,skD:0,skF:0,skQ:0,skW:0,skE:0},SAVE.sk||{});
 const SK_MAX=10;
