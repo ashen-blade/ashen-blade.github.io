@@ -2236,6 +2236,45 @@ const _wuM=worldUpdate;worldUpdate=function(dt){const g0=gateOpen;_wuM(dt);
  // keep the stage's touch handlers from eating the swipe
  for(const ev of ['touchstart','touchmove'])C.addEventListener(ev,e=>e.stopPropagation(),{passive:true});
 }
+// ===================== bulk dismantle =====================
+document.head.insertAdjacentHTML('beforeend',`<style>
+#bkBtn{margin-left:1cqh;background:#3a1820!important;color:#ffb0a8!important;border-color:#9a1420!important}
+#bkOv{position:absolute;inset:0;z-index:6;background:rgba(4,2,8,.78);display:flex;align-items:center;justify-content:center;border-radius:inherit}
+.bkb{width:min(92%,90cqh);background:#16121e;border:1px solid #c9a04a;border-radius:2.4cqh;padding:3cqh 3.4cqh;display:flex;flex-direction:column;gap:1.8cqh;color:#ece6f4;font-size:2.9cqh}
+.bkb>b{font-family:"Black Han Sans",sans-serif;font-weight:400;font-size:4.4cqh;color:#ffd27a}
+.bkg{display:flex;gap:1.2cqh;flex-wrap:wrap}.bkg label{display:flex;align-items:center;gap:.8cqh;border:1px solid;border-radius:999px;padding:.8cqh 2.2cqh;cursor:pointer;background:#1e1828}
+.bkb .opt{display:flex;align-items:center;gap:1cqh;color:#cfc6dc;font-size:2.6cqh}
+.bkr{background:#0e0b14;border:1px solid #3a3048;border-radius:1.4cqh;padding:1.4cqh 2cqh;line-height:1.6}.bkr strong{font-weight:400;color:#ffd27a}
+.bkrow{display:flex;gap:1.6cqh;justify-content:flex-end}.bkrow button{border:0;border-radius:1.4cqh;padding:1.4cqh 4cqh;font-size:3cqh;font-family:inherit;color:#fff;background:#3a3048}
+.bkrow button.p{background:linear-gradient(#e8433a,#9a1420)}.bkrow button:disabled{opacity:.35}
+</style>`);
+$('iCnt').insertAdjacentHTML('afterend','<button type="button" id="bkBtn">일괄 분해</button>');
+document.querySelector('.ibox').insertAdjacentHTML('beforeend',`<div id="bkOv" hidden><div class="bkb"><b>일괄 분해</b>
+<div class="bkg" id="bkG"></div>
+<label class="opt"><input type="checkbox" id="bkLv" checked> 강화한 장비(+1 이상)는 남기기</label>
+<label class="opt"><input type="checkbox" id="bkTab"> 지금 보고 있는 탭(<span id="bkTabN"></span>)만</label>
+<div class="bkr" id="bkR"></div>
+<div class="bkrow"><button type="button" id="bkNo">취소</button><button type="button" class="p" id="bkGo">분해하기</button></div></div></div>`);
+const bkSel=new Set([0,1]);let bkSure=0;
+function bkList(){const eqd=new Set(Object.values(SAVE.eq)),lv=$('bkLv').checked,tab=$('bkTab').checked&&iFilter;
+  return SAVE.inv.filter(it=>!eqd.has(it.u)&&bkSel.has(it.g)&&!(lv&&it.lv>0)&&!(tab&&it.s!==iFilter))}
+function bkPaint(){bkSure=0;const G=$('bkG');G.innerHTML='';
+  GRADE.forEach((n,g)=>{const l=document.createElement('label');l.style.borderColor=GCOL[g];l.style.color=GCOL[g];l.innerHTML=`<input type="checkbox" ${bkSel.has(g)?'checked':''}> ${n}`;
+    l.querySelector('input').onchange=e=>{e.target.checked?bkSel.add(g):bkSel.delete(g);bkPaint()};G.appendChild(l)});
+  $('bkTabN').textContent=iFilter?SLOTN[iFilter]:'전체';$('bkTab').disabled=!iFilter;
+  const L=bkList(),t={ash:0,stone:0,cry:0};for(const it of L){const v=dismantleVal(it);t.ash+=v.ash;t.stone+=v.stone;t.cry+=v.cry}
+  const hi=L.filter(it=>it.g>=2).length;
+  $('bkR').innerHTML=L.length?`<strong>${L.length}개</strong> 분해 → 잿가루 +${t.ash.toLocaleString()}${t.stone?' · 강화석 +'+t.stone:''}${t.cry?' · 마력 결정 +'+t.cry:''}${hi?`<br><span style="color:#ff9a8a">⚠ 영웅·전설 ${hi}개가 포함돼 있어요</span>`:''}<br><small style="color:#8a7f9a">장착 중인 장비는 분해되지 않아요</small>`:'조건에 맞는 장비가 없어요';
+  const b=$('bkGo');b.disabled=!L.length;b.textContent='분해하기'}
+$('bkBtn').addEventListener('click',()=>{sfx('ui');$('bkOv').hidden=false;bkPaint()});
+$('bkNo').addEventListener('click',()=>{$('bkOv').hidden=true});
+$('bkLv').addEventListener('change',bkPaint);$('bkTab').addEventListener('change',bkPaint);
+$('bkGo').addEventListener('click',()=>{const L=bkList();if(!L.length)return;
+  if(!bkSure){bkSure=1;$('bkGo').textContent=`정말 ${L.length}개 분해?`;return}
+  const t={ash:0,stone:0,cry:0},del=new Set(L.map(x=>x.u));for(const it of L){const v=dismantleVal(it);t.ash+=v.ash;t.stone+=v.stone;t.cry+=v.cry}
+  SAVE.ash+=t.ash;SAVE.stone+=t.stone;SAVE.cry+=t.cry;SAVE.inv=SAVE.inv.filter(x=>!del.has(x.u));if(iSel&&del.has(iSel))iSel=null;
+  sfx('kill');saveNow();$('bkOv').hidden=true;paintInv();iMsg(`${L.length}개 분해 · 잿가루 +${t.ash.toLocaleString()}`,'#ffd27a')});
+$('iClose').addEventListener('click',()=>{$('bkOv').hidden=true});
 // ===================== skill upgrades (spend 잿가루 / 강화석) =====================
 SAVE.sk=Object.assign({skA:0,skS:0,skD:0,skF:0,skQ:0,skW:0,skE:0},SAVE.sk||{});
 const SK_MAX=10;
