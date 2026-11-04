@@ -586,11 +586,12 @@ function moveUpdate(dt){
   else if(!M.ult&&p.move!=='skS'&&p.move!=='skQ'&&p.move!=='skF'){const ga=p.z<2;p.x+=dx*(ga?120:150)*dt;p.y+=dy*85*dt}
   if(M.air||p.move==='air'){p.vz-=GRAV*0.55*dt;p.z=Math.max(0,p.z+p.vz*dt);p.x+=dx*120*dt}
   if(p.move==='skF'){const u=Math.min(1,t/0.43);p.z=p.slamZ0*(1-u)+Math.sin(u*Math.PI)*120*(1-u*0.15);if(t>=0.43)p.z=0;p.x+=p.face*90*dt*(t<0.43?1:0)}
-  if(p.move==='skQ'){if(p.diveT>0){p.diveT-=dt;p.vz-=GRAV*dt;p.z=Math.max(1,p.z+p.vz*dt)}else{p.vz=-1300;p.z+=p.vz*dt;p.x+=p.face*230*dt;
+  if(p.move==='skQ'){if(p.diveT>0){p.diveT-=dt;p.vz-=GRAV*dt;p.z=Math.max(1,p.z+p.vz*dt)}else if(p.diveHit){p.z=0;p.vz=0}else{p.vz=-1300;p.z+=p.vz*dt;p.x+=p.face*230*dt;
       if(p.z<=0&&!p.diveHit){p.z=0;p.diveHit=true;p.mt=Math.max(p.mt,0.62);const QD=MOVES.skQ.dive2||{w:240,m:1},h={off:-QD.w/2,w:QD.w,dy:56,dmg:[440*QD.m,520*QD.m],stun:.6,kz:330,bounce:1,otg:1,hs:.1,big:1,zr:[-20,160]};
         for(const e of mons)if(canHit(e)&&overlaps(p,h,e))applyHit(e,h,p);ringFx(p.x,p.y,170,'255,200,120');crackFx(p.x,p.y);spr(3,p.x,p.y,40,{sc:0.75,t:0.35});spr(5,p.x-p.face*30,p.y,90,{face:p.face,sc:0.55,t:0.18});for(let i=0;i<10;i++)dust(p.x+rnd(-60,60),p.y,3);sfx('boom');shake=Math.max(shake,10)}}
     if(p.z>0&&p.mt>0.6&&!p.diveHit)p.mt=0.6}
   else p.diveHit=false;
+  if(p.z<0){p.z=0;if(p.vz<0)p.vz=0}
   if(M.after&&Math.random()<0.6)imgs.push({x:p.x,y:p.y,z:p.z,face:p.face,move:p.move,mt:p.mt,t:0.22,m:0.22});
   // hits
   M.hits.forEach((h,i)=>{if(t>=h.t&&t0<h.t+h.d){for(const e of mons){if(!canHit(e)||p.hitSets[i].has(e))continue;if(overlaps(p,h,e)){p.hitSets[i].add(e);applyHit(e,h,p)}}}});
