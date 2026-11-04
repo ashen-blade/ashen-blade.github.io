@@ -2201,7 +2201,7 @@ const itemBy=u=>SAVE.inv.find(x=>x.u===u);
 const ZS=()=>({atk:0,crit:0,hp:0,def:0,mpr:0,cdr:0,hpp:0,boss:0,combo:0,kheal:0,ult:0});
 function gearStats(){const t=ZS();for(const s of ['w','a','c']){const it=itemBy(SAVE.eq[s]);if(it){const o=iStats(it);for(const k in o)t[k]+=o[k]}}return t}
 const hasGear=()=>['w','a','c'].some(s=>itemBy(SAVE.eq[s]));
-function applyPB(on){const t=on?gearStats():ZS();PB.atk=1+t.atk/100;PB.crit=Math.min(.6,t.crit/100);PB.hp=Math.round((2400+t.hp)*(1+t.hpp/100)-2400);PB.def=Math.max(.35,1-t.def/100);PB.mpr=1+t.mpr/100;PB.cdr=Math.max(.55,1-t.cdr/100);
+let GEAR_SC=1;function applyPB(on){const t=on?gearStats():ZS();if(on&&GEAR_SC!==1)for(const k in t)t[k]*=GEAR_SC;PB.atk=1+t.atk/100;PB.crit=Math.min(.6,t.crit/100);PB.hp=Math.round((2400+t.hp)*(1+t.hpp/100)-2400);PB.def=Math.max(.35,1-t.def/100);PB.mpr=1+t.mpr/100;PB.cdr=Math.max(.55,1-t.cdr/100);
   PB.boss=1+t.boss/100;PB.combo=1+t.combo/100;PB.kheal=t.kheal/100;PB.ult=1+t.ult/100}
 // old saves: give items an item level and options slot
 for(const it of SAVE.inv||[]){if(!it.il)it.il=1;if(!it.op)it.op=[]}
@@ -2271,7 +2271,7 @@ function paintInv(){$('iAsh').textContent=Math.floor(SAVE.ash).toLocaleString();
   document.querySelectorAll('.eqcol .slot').forEach(b=>{const s=b.dataset.s,it=itemBy(SAVE.eq[s]);b.className='slot'+(it?'':' empty')+(iSel&&it&&iSel===it.u?' sel':'');b.style.borderColor=it?GCOL[it.g]:'';
     b.innerHTML=(it?icHTML(ICONI[s]+it.g):icHTML(ICONI[s],'')).replace('class="itic ','class="itic '+(it?'':'ghost')+' ')+`<div class="tx"><small>${SLOTN[s]}</small><b style="color:${it?GCOL[it.g]:''}">${it?INAME[s][it.g]+(it.lv?' +'+it.lv:'')+' · Lv'+it.il:'비어 있음'}</b></div>`;
     if(!it)b.querySelector('.itic').style.opacity=.18});
-  const t=gearStats(),ln=statLines(t);$('iTot').innerHTML=`<b>전투력 ${power(t).toLocaleString()}</b>${ln.length?ln.join('<br>'):'장비를 장착하면 능력치가 올라가요'}`;
+  const t=gearStats(),ln=statLines(t);$('iTot').innerHTML=`<b>전투력 ${power(t).toLocaleString()}</b>${ln.length?ln.join('<br>')+'<br><small style="color:#8a7f9a">아이템 던전 100% · 모험에선 40%만 적용</small>':'장비를 장착하면 능력치가 올라가요'}`;
   document.querySelectorAll('#iTabs button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.f===iFilter?'true':'false'));
   const eqd=new Set(Object.values(SAVE.eq));const list=SAVE.inv.filter(x=>!iFilter||x.s===iFilter).sort((a,b)=>(eqd.has(b.u)-eqd.has(a.u))||power(iStats(b))-power(iStats(a)));
   $('iCnt').textContent=`${SAVE.inv.length} / ${INV_MAX}`;const G=$('iGrid');G.innerHTML='';
@@ -2426,7 +2426,7 @@ $('iClose').addEventListener('click',()=>{$('bkOv').hidden=true});
 const DIFF_BASE=DIFFS.map(d=>Object.assign({},d));
 const ADV_UP={hp:1.3,dmg:1.3,cd:.85,spd:1.06,armor:1.2,heal:.75};
 function setAdvDiff(on){DIFFS.forEach((d,i)=>{const b=DIFF_BASE[i];for(const k in ADV_UP)d[k]=on?+(b[k]*ADV_UP[k]).toFixed(3):b[k];d.tok=on?Math.min(4,b.tok+1):b.tok})}
-const _sgAD=startGame;startGame=function(){setAdvDiff(!(typeof DG!=='undefined'&&DG.on));_sgAD()};
+const _sgAD=startGame;startGame=function(){const adv=!(typeof DG!=='undefined'&&DG.on);setAdvDiff(adv);GEAR_SC=adv?0.4:1;_sgAD()};
 // ===================== skill upgrades (spend 잿가루 / 강화석) =====================
 SAVE.sk=Object.assign({skA:0,skS:0,skD:0,skF:0,skQ:0,skW:0,skE:0},SAVE.sk||{});
 const SK_MAX=10;
@@ -2497,11 +2497,11 @@ $('skClose').addEventListener('click',()=>{$('skOv').hidden=true;paintHome()});
 // wording: the adventure toggle now covers gear and skill levels
 {const g=document.querySelector('label.gearchk');if(g)g.innerHTML='<input type="checkbox" id="aGear"> 장비·스킬 강화 효과 적용 <small>— 켜면 💎성장 랭킹, 끄면 ⚔실력 랭킹에 기록돼요</small>';
  $('aGear').addEventListener('change',e=>{SAVE.useGear=e.target.checked;saveNow()});
- const t=document.querySelector('.gtog');if(t)t.lastChild.textContent=' 모험에도 장비·스킬 효과 적용 (켜면 성장 랭킹)'}
+ const t=document.querySelector('.gtog');if(t)t.lastChild.textContent=' 모험에도 장비·스킬 효과 적용 (장비는 40%, 켜면 성장 랭킹)'}
 // achievement for maxing a skill
 if(typeof ACH!=='undefined'&&!ACHM.sk10){const a=['sk10','⚡','한계 돌파','스킬 하나를 10레벨까지 강화',500];ACH.push(a);ACHM.sk10=a}
 {const b=document.querySelector('[data-gr="1"]');if(b)b.innerHTML='💎 성장 랭킹 <small>장비·스킬 강화</small>';const a=document.querySelector('[data-gr="0"]');if(a)a.innerHTML='⚔ 실력 랭킹 <small>강화 없이</small>'}
-const _gnSK=showResult;showResult=function(win){_gnSK(win);const g=$('gearNote');if(g&&RUNGEAR)g.textContent=`💎 장비·스킬 강화를 쓴 기록이라 성장 랭킹에 올라가요 (전투력 ${RUNPOW.toLocaleString()})`};
+const _gnSK=showResult;showResult=function(win){_gnSK(win);const g=$('gearNote');if(g&&RUNGEAR)g.textContent=`💎 장비·스킬 강화를 쓴 기록이라 성장 랭킹에 올라가요 (전투력 ${RUNPOW.toLocaleString()}) · 모험에선 장비 효과 40%`};
 // ===================== daily missions + attendance =====================
 const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
 const dayNum=s=>Math.floor(Date.UTC(+s.slice(0,4),+s.slice(5,7)-1,+s.slice(8,10))/864e5);
