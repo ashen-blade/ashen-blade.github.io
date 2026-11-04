@@ -1384,6 +1384,150 @@ const IGP={wa:-2.35,hand:[4,-6],bhand:[-10,14]};const _ep3=enemyPose;enemyPose=f
 // fiery aura behind the general
 const _drA=drawRig;drawRig=function(e,P,L,o){if(e&&e.T&&e.T.kind==='ignis'&&!(o&&o.tint)){ctx.save();ctx.globalCompositeOperation='lighter';const g=ctx.createRadialGradient(0,-90,10,0,-90,170);
     g.addColorStop(0,`rgba(255,110,20,${0.2+0.07*Math.sin(time*4)})`);g.addColorStop(1,'rgba(255,60,0,0)');ctx.fillStyle=g;ctx.fillRect(-180,-270,360,300);ctx.restore()}return _drA(e,P,L,o)};
+// ---- chapter 4 art (generated) ----
+const ART4_fskel={parts:{"torso": {"ax": 167.6, "ay": 95.9, "len": 43.62, "x": 0, "y": 0, "w": 317, "h": 172}, "head": {"ax": 21.2, "ay": 70.6, "len": 33.81, "x": 319, "y": 0, "w": 139, "h": 134}, "uarmF": {"ax": 41.3, "ay": 62.9, "len": 22.77, "x": 460, "y": 0, "w": 126, "h": 115}, "uarmB": {"ax": 41.0, "ay": 61.4, "len": 22.51, "x": 588, "y": 0, "w": 125, "h": 113}, "farmF": {"ax": 20.9, "ay": 67.0, "len": 30.28, "x": 715, "y": 0, "w": 135, "h": 134}, "farmB": {"ax": 21.7, "ay": 70.9, "len": 31.5, "x": 852, "y": 0, "w": 139, "h": 137}, "thighF": {"ax": 24.7, "ay": 57.7, "len": 26.9, "x": 993, "y": 0, "w": 128, "h": 121}, "thighB": {"ax": 30.4, "ay": 61.0, "len": 26.53, "x": 1123, "y": 0, "w": 133, "h": 126}, "shinF": {"ax": 15.0, "ay": 57.3, "len": 39.67, "x": 1258, "y": 0, "w": 157, "h": 101}, "shinB": {"ax": 13.7, "ay": 53.0, "len": 39.62, "x": 1417, "y": 0, "w": 155, "h": 98}, "weapon": {"ax": 49.4, "ay": 46.5, "len": 76.72, "x": 1574, "y": 0, "w": 284, "h": 91}, "shield": {"ax": 4.3, "ay": 75.0, "len": 52.2, "x": 1860, "y": 0, "w": 165, "h": 150}},src:'a/0e6bd25c9c3e.webp',kb:{"hip": 64.6, "torso": 43.62, "thigh": 26.9, "shin": 39.67, "uarm": 22.77, "farm": 30.28, "head": 33.81, "stride": 1.4, "shF": -2.5, "shB": -8.5, "shDrop": 12.3, "neckX": 0, "neckY": 0, "weapon": 76.72, "shield": 52.2}};
+const ART4_farcher={parts:{"torso": {"ax": 169.9, "ay": 86.2, "len": 38.5, "x": 0, "y": 0, "w": 310, "h": 144}, "head": {"ax": 18.2, "ay": 63.2, "len": 36.0, "x": 312, "y": 0, "w": 140, "h": 122}, "cape": {"ax": 10.2, "ay": 79.7, "len": 97.01, "x": 454, "y": 0, "w": 312, "h": 180}, "uarmF": {"ax": 23.1, "ay": 59.9, "len": 26.81, "x": 768, "y": 0, "w": 115, "h": 110}, "uarmB": {"ax": 24.9, "ay": 60.0, "len": 26.16, "x": 885, "y": 0, "w": 114, "h": 111}, "farmF": {"ax": 13.0, "ay": 63.3, "len": 33.5, "x": 1001, "y": 0, "w": 127, "h": 127}, "farmB": {"ax": 13.3, "ay": 65.0, "len": 35.15, "x": 1130, "y": 0, "w": 131, "h": 129}, "thighF": {"ax": 14.3, "ay": 41.4, "len": 27.73, "x": 1263, "y": 0, "w": 107, "h": 82}, "thighB": {"ax": 17.2, "ay": 51.7, "len": 28.35, "x": 1372, "y": 0, "w": 116, "h": 102}, "shinF": {"ax": 10.3, "ay": 42.0, "len": 37.74, "x": 1490, "y": 0, "w": 141, "h": 73}, "shinB": {"ax": 10.2, "ay": 37.3, "len": 37.73, "x": 1633, "y": 0, "w": 140, "h": 67}, "weapon": {"ax": 222.0, "ay": 113.0, "len": 62.44, "x": 1775, "y": 0, "w": 424, "h": 186}},src:'a/10e45c282115.webp',kb:{"hip": 63.5, "torso": 38.5, "thigh": 27.73, "shin": 37.74, "uarm": 26.81, "farm": 33.5, "head": 36.0, "stride": 1.4, "shF": -0.3, "shB": -6.3, "shDrop": 10.5, "neckX": 0, "neckY": 0, "weapon": 62.44, "cape": 97.01, "capeY": 1.5, "capeX": -0.7}};
+const ART4_igiant={parts:{"torso": {"ax": 245.5, "ay": 164.0, "len": 53.77, "x": 0, "y": 0, "w": 451, "h": 327}, "head": {"ax": 19.0, "ay": 105.2, "len": 39.3, "x": 453, "y": 0, "w": 160, "h": 187}, "uarmF": {"ax": 52.0, "ay": 91.6, "len": 30.1, "x": 615, "y": 0, "w": 162, "h": 160}, "uarmB": {"ax": 51.3, "ay": 97.2, "len": 30.84, "x": 779, "y": 0, "w": 164, "h": 169}, "farmF": {"ax": 27.5, "ay": 90.3, "len": 44.65, "x": 945, "y": 0, "w": 192, "h": 180}, "farmB": {"ax": 31.5, "ay": 93.3, "len": 45.5, "x": 1139, "y": 0, "w": 203, "h": 183}, "thighF": {"ax": 16.7, "ay": 68.0, "len": 34.58, "x": 1344, "y": 0, "w": 134, "h": 137}, "thighB": {"ax": 16.6, "ay": 63.3, "len": 33.65, "x": 1480, "y": 0, "w": 131, "h": 133}, "shinF": {"ax": 15.1, "ay": 107.7, "len": 44.72, "x": 1613, "y": 0, "w": 179, "h": 156}, "shinB": {"ax": 14.5, "ay": 80.5, "len": 45.65, "x": 1794, "y": 0, "w": 181, "h": 148}, "weapon": {"ax": 87.2, "ay": 107.4, "len": 128.19, "x": 1977, "y": 0, "w": 534, "h": 264}},src:'a/248534f2dff3.webp',kb:{"hip": 76.9, "torso": 53.77, "thigh": 34.58, "shin": 44.72, "uarm": 30.1, "farm": 44.65, "head": 39.3, "stride": 1.4, "shF": -0.6, "shB": -6.6, "shDrop": 16.3, "neckX": 0, "neckY": 0, "weapon": 128.19, "bulk": 1.2}};
+const ART4_harval={parts:{"torso": {"ax": 244.5, "ay": 122.7, "len": 47.32, "x": 0, "y": 0, "w": 415, "h": 232}, "head": {"ax": 14.8, "ay": 124.8, "len": 48.55, "x": 417, "y": 0, "w": 187, "h": 183}, "cape": {"ax": 11.9, "ay": 133.9, "len": 146.54, "x": 606, "y": 0, "w": 461, "h": 285}, "uarmF": {"ax": 46.1, "ay": 86.2, "len": 35.45, "x": 1069, "y": 0, "w": 169, "h": 153}, "uarmB": {"ax": 44.2, "ay": 79.3, "len": 33.85, "x": 1240, "y": 0, "w": 163, "h": 146}, "farmF": {"ax": 23.0, "ay": 92.4, "len": 45.68, "x": 1405, "y": 0, "w": 180, "h": 180}, "farmB": {"ax": 22.0, "ay": 95.0, "len": 45.72, "x": 1587, "y": 0, "w": 182, "h": 181}, "thighF": {"ax": 13.6, "ay": 56.1, "len": 38.67, "x": 1771, "y": 0, "w": 143, "h": 116}, "thighB": {"ax": 17.2, "ay": 58.0, "len": 38.75, "x": 1916, "y": 0, "w": 147, "h": 119}, "shinF": {"ax": 12.7, "ay": 59.0, "len": 50.13, "x": 2065, "y": 0, "w": 181, "h": 101}, "shinB": {"ax": 12.8, "ay": 57.6, "len": 50.14, "x": 2248, "y": 0, "w": 182, "h": 102}, "weapon": {"ax": 80.4, "ay": 69.4, "len": 148.45, "x": 2432, "y": 0, "w": 534, "h": 138}},src:'a/ad12580609ec.webp',kb:{"hip": 86.1, "torso": 47.32, "thigh": 38.67, "shin": 50.13, "uarm": 35.45, "farm": 45.68, "head": 48.55, "stride": 1.4, "shF": 0.1, "shB": -5.9, "shDrop": 15.6, "neckX": 0, "neckY": 0, "weapon": 148.45, "cape": 146.54, "capeY": 2.0, "capeX": -0.8}};
+const ART4_bg='a/42a97badbad7.jpg';
+// ===================== Chapter 4 : 서리 왕릉 =====================
+for(const [k,A] of [['fskel',ART4_fskel],['farcher',ART4_farcher],['igiant',ART4_igiant],['harval',ART4_harval]])regCut(k,A.parts,A.src,A.kb);
+loadImg('bg4',ART4_bg);
+ECUT.gchief=Object.assign({},ECUT.igiant,{imgKey:'cut_igiant',kb:Object.assign({},ECUT.igiant.kb,{sc:1.3})});
+ECUT.harval.kb.sc=1.06;ECUT.fskel.kb.sc=1.08;ECUT.farcher.kb.sc=1.08;ECUT.igiant.kb.weapon=96;ECUT.fskel.kb.weapon=80;
+
+Object.assign(ETYPE,{
+  fskel:{nm:'서리 해골 전사',hp:3200,spd:92,w:36,h:120,look:'grunt',base:'grunt',cut:'fskel',shield:1,frost:1,
+    atk:{range:120,wind:.55,dur:1,hit:{off:0,w:132,dmg:[150,185],stun:.45,kx:240}},cd:[1.2,2]},
+  farcher:{nm:'빙결 궁수',hp:1900,spd:105,w:32,h:112,look:'caster',base:'caster',cut:'farcher',ranged:1,keep:380,arrow:1,
+    atk:{range:640,wind:.75,dur:1.15},cd:[1.8,2.8]},
+  igiant:{nm:'얼음 거인',hp:4600,spd:66,w:48,h:140,look:'grunt',base:'grunt',cut:'igiant',armor:1000,frost:1,slam:1,
+    atk:{range:130,wind:.85,dur:1.35,hit:{off:0,w:170,dmg:[190,230],stun:.6,kx:320}},cd:[1.6,2.4]},
+  gchief:{nm:'서리 거인 족장 · 요툰',hp:13000,spd:72,w:58,h:178,look:'grunt',base:'grunt',cut:'gchief',armor:2200,frost:1,slam:2,elite:1,
+    atk:{range:160,wind:.8,dur:1.4,hit:{off:0,w:210,dmg:[230,270],stun:.7,kx:360}},cd:[1.3,2]},
+  harval:{nm:'빙결의 왕 하르발',hp:68000,spd:125,w:56,h:186,look:'vlord',cut:'harval',kind:'harval',armor:4600,cd:[1,1.6]},
+});
+ROOMS.push(
+  {w:1450,nm:'서리 왕릉 · 얼어붙은 회랑',ch:4,spawn:[['fskel',650],['farcher',900],['fskel',1050],['farcher',1250]]},
+  {w:1550,nm:'서리 왕릉 · 왕들의 석상',ch:4,spawn:[['igiant',700],['fskel',850],['farcher',1100],['fskel',1250],['farcher',1400]]},
+  {w:1600,nm:'서리 왕릉 · 빙하 계단',ch:4,spawn:[['fskel',650],['igiant',850],['fskel',1050],['farcher',1350]],
+    wave2:[['fskel',300],['farcher',450],['igiant',1400],['fskel',1500]]},
+  {w:1550,nm:'서리 왕릉 · 봉인의 문',ch:4,spawn:[['farcher',700],['igiant',850],['fskel',950],['farcher',1200],['igiant',1300],['fskel',1400]]},
+  {w:1300,nm:'서리 왕릉 · 거인의 무덤',ch:4,elite:1,spawn:[['gchief',950],['farcher',700],['fskel',1150]]},
+  {w:1250,nm:'서리 왕릉 · 빙결의 옥좌',ch:4,boss:1,spawn:[['harval',880]]},
+);
+CHAPTERS.push({n:4,nm:'서리 왕릉',desc:'빙결의 왕 하르발이 잠든 빙하 속 왕들의 무덤',bg:'bg4',tileW:959,torch:[],
+  mobs:['fskel','farcher','igiant','fskel'],boss:'harval',bossNm:'빙결의 왕 하르발',music:['night','dragon'],
+  win:'빙결의 왕 하르발을 쓰러뜨리고 서리 왕릉의 봉인을 깼다.',col:'#d8ecff',acc:'#7ad0ff'});
+
+const _spawn4=spawnEnemy;spawnEnemy=function(type,x){const e=_spawn4(type,x);if(ETYPE[type].kind==='harval'){e.type='boss';boss=e;e.summoned=false;e.y=DEPTH*0.5;e.icT=3}return e};
+
+// ---------- frost: slows Kael ----------
+const ICE='150,220,255';
+function chill(t){const p=player;if(!p)return;if(!(p.slowT>0))addNum(p.x,p.y,p.z+150,'❄ 둔화',0);p.slowT=Math.max(p.slowT||0,t)}
+let _frostSrc=null;
+const _hp4=hurtPlayer;hurtPlayer=function(d,kx,knock){const p=player,h0=p?p.hp:0;_hp4(d,kx,knock);if(p&&p.hp<h0&&_frostSrc)chill(_frostSrc)};
+const _wu4=worldUpdate;worldUpdate=function(dt){const p=player,x0=p&&p.x,y0=p&&p.y;_wu4(dt);if(!p||state!=='play')return;
+  if(p.slowT>0){p.slowT-=dt;if(p.st==='walk'||p.st==='run'){p.x=x0+(p.x-x0)*0.55;p.y=y0+(p.y-y0)*0.55}
+    if(Math.random()<0.35)fxs.push({k:'glow',x:p.x+rnd(-22,22),y:p.y,z:p.z+rnd(10,120),r:rnd(3,6),t:.4,m:.4,col:ICE})}
+  if(boss&&boss.T.kind==='harval'&&boss.phase2&&boss.hp>0&&room&&room.boss){boss.icT-=dt;if(boss.icT<=0){boss.icT=rnd(2.6,3.6);iceSpike(p.x+rnd(-30,30),p.y,0.75,rnd(150,180),1.6)}}};
+
+// ---------- ice projectiles, patches, spikes ----------
+function icePatch(x,y,r,life){shots.push({type:'ipatch',x:clamp(x,40,room.w-40),y:clamp(y,6,DEPTH-6),r:r||70,life:life||3.5,m:life||3.5,own:'e'})}
+function iceSpike(x,y,delay,dmg,slow){shots.push({type:'spike',ice:1,x:clamp(x,40,room.w-40),y:clamp(y,6,DEPTH-6),delay,life:delay+0.45,hit:false,own:'e',dmg,slow:slow||1.2})}
+const _sh4=shotsUpdate;shotsUpdate=function(dt){const p=player;
+  for(const s of shots){
+    if(s.type==='iarrow'){s.x+=s.vx*dt;if(Math.random()<0.7)fxs.push({k:'glow',x:s.x-s.face*rnd(0,30),y:s.y,z:s.z,r:rnd(3,6),t:.25,m:.25,col:ICE});
+      if(Math.abs(p.x-s.x)<30&&Math.abs(p.y-s.y)<26&&p.z<90&&p.inv<=0){hurtPlayer(s.dmg,s.face*200,false);chill(1.6);s.life=0;s.done=1;burst(s.x,s.y,s.z,ICE)}
+      else if(s.life-dt<=0&&!s.done){s.done=1;icePatch(s.x,s.y,62,3.2)}}
+    else if(s.type==='ipatch'){if(p.z<6&&Math.hypot(p.x-s.x,(p.y-s.y)*2.4)<s.r)p.slowT=Math.max(p.slowT||0,0.25)}
+    else if(s.type==='spike'&&s.ice){s.delay-=dt;
+      if(s.delay<=0&&!s.hit&&s.life>0.12&&Math.abs(p.x-s.x)<40&&Math.abs(p.y-s.y)<26&&p.z<40){s.hit=true;const h0=p.hp;hurtPlayer(s.dmg||rnd(170,200),Math.sign(p.x-s.x||1)*240,true);if(p.hp<h0)chill(s.slow)}
+      if(s.delay<=0&&!s.boomed){s.boomed=1;for(let i=0;i<5;i++)fxs.push({k:'glow',x:s.x+rnd(-14,14),y:s.y,z:rnd(10,80),r:rnd(3,7),t:.5,m:.5,col:ICE})}
+      s.type='ispike'}}
+  _sh4(dt);for(const s of shots)if(s.type==='ispike')s.type='spike'};
+const _ds4=drawSpike;drawSpike=function(s){if(!s.ice)return _ds4(s);const sx=SX(s.x),sy=SY(s.y,0);ctx.save();
+  if(s.delay>0){ctx.globalAlpha=0.35+0.35*Math.sin(time*30);ctx.fillStyle='rgba(120,200,255,.75)';ctx.beginPath();ctx.ellipse(sx,sy,36,11,0,0,7);ctx.fill();ctx.strokeStyle='rgba(230,248,255,.9)';ctx.lineWidth=2;ctx.stroke()}
+  else{const age=0.45-s.life,u=clamp(age/0.08,0,1),fade=clamp(s.life/0.15,0,1);ctx.globalAlpha=fade;
+    for(const [ox,hh,w] of [[-16,72,10],[0,112,13],[15,64,9],[-4,44,7]]){const h=hh*u,g=ctx.createLinearGradient(0,sy-h,0,sy);g.addColorStop(0,'#ffffff');g.addColorStop(.3,'#9fdcff');g.addColorStop(1,'#2a5a90');ctx.fillStyle=g;
+      ctx.beginPath();ctx.moveTo(sx+ox-w,sy);ctx.lineTo(sx+ox-w*0.2,sy-h);ctx.lineTo(sx+ox+w,sy);ctx.closePath();ctx.fill();ctx.strokeStyle='rgba(20,40,80,.8)';ctx.lineWidth=1.5;ctx.stroke()}
+    ctx.globalCompositeOperation='lighter';ctx.globalAlpha=fade*0.4;const g=ctx.createRadialGradient(sx,sy-40,4,sx,sy-40,90);g.addColorStop(0,'rgba(150,220,255,.8)');g.addColorStop(1,'rgba(80,160,255,0)');ctx.fillStyle=g;ctx.fillRect(sx-90,sy-130,180,150)}
+  ctx.restore()};
+function drawIce(front){for(const s of shots){const sx=SX(s.x);
+    if(s.type==='ipatch'&&!front){const sy=SY(s.y,0),a=Math.min(1,s.life/0.5,(s.m-s.life)/0.2+0.2);ctx.save();ctx.globalAlpha=a*0.85;
+      const g=ctx.createRadialGradient(sx,sy,4,sx,sy,s.r);g.addColorStop(0,'rgba(220,245,255,.75)');g.addColorStop(.7,'rgba(120,190,240,.45)');g.addColorStop(1,'rgba(80,150,230,0)');ctx.fillStyle=g;
+      ctx.beginPath();ctx.ellipse(sx,sy,s.r,s.r/2.4,0,0,7);ctx.fill();ctx.strokeStyle='rgba(230,250,255,.5)';ctx.lineWidth=1.5;for(let i=0;i<3;i++){const a0=i*2.1+s.x;ctx.beginPath();ctx.moveTo(sx+Math.cos(a0)*s.r*0.2,sy+Math.sin(a0)*6);ctx.lineTo(sx+Math.cos(a0)*s.r*0.8,sy+Math.sin(a0)*s.r/3)}ctx.stroke();ctx.restore()}
+    else if(s.type==='iarrow'&&front){const sy=SY(s.y,s.z);ctx.save();ctx.translate(sx,sy);ctx.scale(s.face,1);ctx.globalCompositeOperation='lighter';
+      const g=ctx.createLinearGradient(-70,0,10,0);g.addColorStop(0,'rgba(120,200,255,0)');g.addColorStop(1,'rgba(200,240,255,.9)');ctx.strokeStyle=g;ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(-70,0);ctx.lineTo(4,0);ctx.stroke();
+      ctx.globalCompositeOperation='source-over';ctx.strokeStyle='#e8f6ff';ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(-34,0);ctx.lineTo(10,0);ctx.stroke();ctx.fillStyle='#ffffff';ctx.beginPath();ctx.moveTo(20,0);ctx.lineTo(6,-6);ctx.lineTo(8,0);ctx.lineTo(6,6);ctx.closePath();ctx.fill();ctx.restore()}}}
+// boss telegraphs + blizzard overlay
+function drawHarvalMarks(){for(const e of mons){const a=e.atk;if(!(e.T.kind==='harval'&&a))continue;
+  if(a.k==='leap'&&a.tx!=null&&a.t<1.1){const sx=SX(a.tx),sy=SY(a.ty,0);ctx.save();ctx.fillStyle=`rgba(90,170,255,${0.18+0.12*Math.sin(time*25)})`;ctx.beginPath();ctx.ellipse(sx,sy,300,300/2.2,0,0,7);ctx.fill();ctx.globalCompositeOperation='lighter';ctx.strokeStyle=`rgba(180,230,255,${0.6+0.35*Math.sin(time*25)})`;ctx.lineWidth=5;ctx.stroke();ctx.restore()}
+  if(a.k==='dash'&&a.t<0.8){const sx=SX(e.x),sy=SY(e.y,0),len=900*a.dir;ctx.save();ctx.globalCompositeOperation='lighter';const g=ctx.createLinearGradient(sx,0,sx+len,0);g.addColorStop(0,`rgba(120,200,255,${0.5+0.3*Math.sin(time*25)})`);g.addColorStop(1,'rgba(80,150,255,0)');ctx.fillStyle=g;ctx.fillRect(Math.min(sx,sx+len),sy-30,Math.abs(len),46);ctx.restore()}
+  if(a.k==='blizzard'&&a.t<1){const sx=SX(e.x),sy=SY(e.y,0);ctx.save();ctx.strokeStyle=`rgba(170,225,255,${0.5+0.4*Math.sin(time*25)})`;ctx.fillStyle=`rgba(90,160,255,${0.18+0.1*Math.sin(time*25)})`;ctx.beginPath();ctx.ellipse(sx,sy,380,380/2.2,0,0,7);ctx.fill();ctx.globalCompositeOperation='lighter';ctx.lineWidth=6;ctx.stroke();ctx.restore()}}}
+let SNOW=null;
+function drawBlizzard(){if(!(boss&&boss.T.kind==='harval'&&boss.phase2&&boss.hp>0))return;if(!SNOW)SNOW=[...Array(90)].map(()=>({x:Math.random()*W,y:Math.random()*H,v:rnd(120,260),s:rnd(1,3)}));
+  ctx.save();ctx.fillStyle='rgba(120,170,230,.12)';ctx.fillRect(0,0,W,H);ctx.fillStyle='rgba(240,250,255,.85)';
+  for(const f of SNOW){f.x-=f.v*0.75/60;f.y+=f.v/60;if(f.y>H){f.y=-4;f.x=Math.random()*W*1.3}if(f.x<0)f.x+=W;ctx.fillRect(f.x,f.y,f.s,f.s)}
+  const g=ctx.createRadialGradient(W/2,H/2,H*0.35,W/2,H/2,H*0.9);g.addColorStop(0,'rgba(200,230,255,0)');g.addColorStop(1,'rgba(200,230,255,.28)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);ctx.restore()}
+const _fx4=drawFxLayer;drawFxLayer=function(front){_fx4(front);if(!room)return;if(!front)drawHarvalMarks();drawIce(front);if(front)drawBlizzard()};
+
+// ---------- archers shoot ice arrows; frost melee; giant slams ----------
+const _atk4=atkUpdate;atkUpdate=function(e,dt){const T=e.T;
+  if(T.arrow){const A=T.atk,a=e.atk;a.t+=dt;
+    if(!a.hit&&a.t>=A.wind){a.hit=true;shots.push({type:'iarrow',x:e.x+e.face*40,y:e.y,z:70,vx:e.face*720,face:e.face,life:0.95,own:'e',dmg:rnd(120,150)});sfx('bolt')}
+    if(a.t>=A.dur){e.atk=null;e.st='idle';e.cd=rnd(T.cd[0],T.cd[1])*DF().cd}return}
+  const a=e.atk,h0=a&&a.hit;_frostSrc=T.frost?(T.elite?1.6:1.1):null;try{_atk4(e,dt)}finally{_frostSrc=null}
+  if(T.slam&&a&&!h0&&a.hit){const x=e.x+e.face*60;crackFx(x,e.y);shake=Math.max(shake,T.elite?14:9);sfx('boom');for(let i=0;i<8;i++)fxs.push({k:'glow',x:x+rnd(-50,50),y:e.y,z:rnd(0,40),r:rnd(4,8),t:.5,m:.5,col:ICE});
+    if(T.slam>1){shots.push({type:'ring',x,y:e.y,r:30,vr:420,maxR:300,delay:0,life:1.2,hit:false,own:'e',col:ICE});for(let k=0;k<4;k++)iceSpike(x+e.face*(110+k*80),player.y,0.3+k*0.1,rnd(160,190),1.3)}}};
+
+// ---------- 빙결의 왕 하르발 ----------
+function harvalThink(e,dt,dx,dy){const ad=Math.abs(dx);
+  if(!e.summoned&&e.hp<e.max*0.5){e.summoned=true;e.phase2=1;e.armor=e.armorMax;e.icT=2;for(const x of [e.x-320,e.x+320]){const s=spawnEnemy('fskel',clamp(x,80,room.w-80));s.aggro=true}
+    addNum(e.x,e.y,e.T.h+70,'서리 폭풍이 몰아친다!',0);sfx('roar');flash=0.4;flashCol='190,230,255';shake=16}
+  if(e.cd<=0){const r=Math.random(),p2=e.phase2;
+    if(p2&&r<0.2)e.atk={k:'blizzard',t:0,done:false};
+    else if(ad<240&&Math.abs(dy)<45&&r<0.5)e.atk={k:'cleave',t:0,hits:0};
+    else if(r<0.64)e.atk={k:'spikes',t:0,done:false};
+    else if(r<0.82||ad>420)e.atk={k:'dash',t:0,dir:e.face,hit:false,trail:0};
+    else e.atk={k:'leap',t:0,done:false};
+    e.st='atk';sfx('roar');return}
+  const want=210;let mx=ad>want+30?e.face:ad<want-70?-e.face*0.5:0,my=Math.abs(dy)>10?Math.sign(dy):0;
+  e.x+=mx*e.T.spd*DF().spd*dt;e.y+=my*65*dt;e.walk+=(mx||my?1:0)*dt*6;e.st=(mx||my)?'walk':'idle'}
+function harvalAtk(e,dt){const a=e.atk,p=player;a.t+=dt;const fast=e.phase2?0.85:1;
+  if(a.k==='cleave'){for(const [ht,i] of [[0.75*fast,0],[1.3*fast,1]])if(a.t>=ht&&a.hits===i){a.hits++;const h={off:-10,w:250,dy:55,zr:[-20,110]};if(overlaps(e,h,p)){_frostSrc=1.4;try{hurtPlayer(rnd(240,290),e.face*340,i===1)}finally{_frostSrc=null}}
+      fxs.push({k:'arc',x:e.x,y:e.y,z:95,face:e.face,r:180,a0:i?0.9:-1.3,a1:i?-1.3:0.9,t:0.22,m:0.22,col:ICE});for(let k=0;k<6;k++)fxs.push({k:'glow',x:e.x+e.face*rnd(60,210),y:e.y,z:rnd(20,110),r:rnd(4,8),t:.45,m:.45,col:ICE});shake=Math.max(shake,9);sfx('boom')}
+    if(a.t>=1.9)endBossAtk(e)}
+  else if(a.k==='spikes'){if(a.t>=0.75*fast&&!a.done){a.done=true;const dir=Math.sign(p.x-e.x)||e.face,n=e.phase2?11:8;
+      for(let k=0;k<n;k++)iceSpike(e.x+dir*(90+k*80),p.y+(e.phase2?Math.sin(k*1.7)*30:0),0.35+k*0.07,rnd(180,210),1.2);sfx('bolt');shake=Math.max(shake,6);flash=0.1;flashCol='190,230,255'}
+    if(a.t>=1.8)endBossAtk(e)}
+  else if(a.k==='dash'){if(a.t<0.8){e.face=a.dir}
+    else if(a.t<1.45){e.x+=a.dir*820*dt;a.trail-=dt;if(a.trail<=0){a.trail=0.11;icePatch(e.x,e.y,60,3)}
+      if(!a.hit&&Math.abs(p.x-e.x)<75&&Math.abs(p.y-e.y)<40&&p.z<80){a.hit=true;_frostSrc=1.4;try{hurtPlayer(rnd(260,300),a.dir*420,true)}finally{_frostSrc=null}}
+      if(e.x<60||e.x>room.w-60){e.x=clamp(e.x,60,room.w-60);a.t=Math.max(a.t,1.45);shake=16;sfx('boom')}}
+    if(a.t>=2.1)endBossAtk(e)}
+  else if(a.k==='leap'){if(a.t<0.6){a.tx=p.x;a.ty=p.y}
+    if(a.t<0.85)e.z=Math.sin(Math.min(1,a.t/0.85)*Math.PI*0.5)*240;
+    else if(a.t<1.1){const u=(a.t-0.85)/0.25;e.x=lerp(e.x,a.tx,u);e.y=lerp(e.y,a.ty,u);e.z=240*(1-u)}
+    if(a.t>=1.1&&!a.done){a.done=true;e.z=0;e.x=clamp(a.tx,60,room.w-60);e.y=a.ty;shake=22;sfx('boom');crackFx(e.x,e.y);
+      for(let k=0;k<2;k++)shots.push({type:'ring',x:e.x,y:e.y,r:40,vr:450,maxR:320,delay:k*0.3,life:1.3,hit:false,own:'e',col:ICE});
+      for(let i=0;i<6;i++){const ang=i/6*Math.PI*2;iceSpike(e.x+Math.cos(ang)*175,e.y+Math.sin(ang)*55,0.45+i*0.05,rnd(150,180),1.2)}icePatch(e.x,e.y,120,4)}
+    if(a.t>=2.0){e.z=0;endBossAtk(e)}}
+  else if(a.k==='blizzard'){if(a.t<1.0)e.z=Math.sin(Math.min(1,a.t/1.0)*Math.PI*0.5)*70;
+    if(a.t>=1.0&&!a.done){a.done=true;shake=18;sfx('boom');flash=0.25;flashCol='200,235,255';for(let k=0;k<3;k++)shots.push({type:'ring',x:e.x,y:e.y,r:40,vr:470,maxR:400,delay:k*0.28,life:1.3,hit:false,own:'e',col:ICE});
+      for(let i=0;i<7;i++)iceSpike(p.x+rnd(-260,260),clamp(p.y+rnd(-50,50),6,DEPTH-6),0.7+i*0.12,rnd(150,180),1.4)}
+    if(a.t>1.0)e.z=Math.max(0,e.z-dt*300);if(a.t>=2.0)endBossAtk(e)}}
+const _bt4=bossThink,_ba4=bossAtk;
+bossThink=function(e,dt,dx,dy){return e.T.kind==='harval'?harvalThink(e,dt,dx,dy):_bt4(e,dt,dx,dy)};
+bossAtk=function(e,dt){return e.T.kind==='harval'?harvalAtk(e,dt):_ba4(e,dt)};
+const HVP={wa:-2.3,hand:[4,-6],bhand:[-10,14]};const _ep4=enemyPose;enemyPose=function(e){if(e.T&&e.T.kind==='harval'&&e.atk&&e.st!=='air'){const a=e.atk,t=a.t,M={cleave:'swing',dash:'charge',leap:'pound'}[a.k];
+    if(M){const k0=a.k;a.k=M;try{return _ep4(e)}finally{a.k=k0}}
+    if(a.k==='spikes')return full({lean:-.15,hand:[16,-44],wa:-1.3,bhand:[-20,-36],head:-.2});
+    if(a.k==='blizzard')return full(t<1.0?{lean:-.1,hand:[18,-40],wa:-1.3,bhand:[-22,-30],footF:[8,-10],footB:[-10,-6]}:{lean:.2,hand:[34,20],wa:.9,bhand:[-24,18]})}
+  const P=_ep4(e);if(e.T&&e.T.kind==='harval'&&!e.atk&&(e.st==='walk'||e.st==='idle')){P.wa=HVP.wa;P.hand=HVP.hand.slice();P.bhand=HVP.bhand.slice();if(e.st==='walk')P.hand[1]+=Math.sin(e.walk)*2}return P};
+// frosty aura behind the king
+const _drA4=drawRig;drawRig=function(e,P,L,o){if(e&&e.T&&e.T.kind==='harval'&&!(o&&o.tint)){ctx.save();ctx.globalCompositeOperation='lighter';const g=ctx.createRadialGradient(0,-95,10,0,-95,180);
+    g.addColorStop(0,`rgba(120,200,255,${0.2+0.07*Math.sin(time*3)})`);g.addColorStop(1,'rgba(60,120,255,0)');ctx.fillStyle=g;ctx.fillRect(-190,-280,380,310);ctx.restore()}return _drA4(e,P,L,o)};
 // adventure cards + ranking tabs are generated from the registry
 {const box=document.querySelector('.chs');if(box){box.innerHTML=CHAPTERS.map(c=>`<button type="button" class="ch" data-ch="${c.n}"><i class="chImg" data-bg="${c.bg}"></i><b>${c.n}장 · ${c.nm}</b><span>${c.desc}</span><em class="chB"></em>${c.n>1?`<div class="lock">🔒 ${c.n-1}장을 클리어하면 열려요</div>`:''}</button>`).join('')+
   `<button type="button" class="ch" data-ch="${ALLRUN}"><i class="chImg" data-bg="lobby"></i><b>전체 도전</b><span>1장부터 ${CHAPTERS.length}장까지 쉬지 않고 연속으로. 전체 클리어 랭킹 도전!</span><em class="chB"></em><div class="lock">🔒 1장을 클리어하면 열려요</div></button>`}
@@ -1969,6 +2113,8 @@ const ACH=[
   ['vladNH','🩸','피 한 방울도','발라크를 한 대도 안 맞고 처치',800],
   ['ignis','🔥','잿불을 식히다','재의 군단장 이그니스 처치',400],
   ['ignisNH','🌋','불길 속의 무결점','이그니스를 한 대도 안 맞고 처치',1000],
+  ['harval','❄','얼어붙은 왕관','빙결의 왕 하르발 처치',500],
+  ['harvalNH','🧊','서리 속의 무결점','하르발을 한 대도 안 맞고 처치',1200],
   ['groggy','💥','철벽 붕괴','보스의 슈퍼아머를 깨서 그로기 만들기',100],
   ['escape','🦷','송곳니를 뿌리치다','발라크의 흡혈 잡기에서 탈출하기',100],
   ['clutch','❤','구사일생','체력 10% 이하로 보스 처치',300],
@@ -2001,7 +2147,7 @@ const _ahA=applyHit;applyHit=function(tg,h,att,opt){const g0=tg.groggy;const r=_
   if(combo.n>ST.maxCombo){ST.maxCombo=combo.n;if(combo.n===30||combo.n===100||combo.n===200)achCheck()}}return r};
 const _kA=kill;kill=function(e){const was=e.deadPending;_kA(e);if(was||e.T.dummy||RUN.inTut())return;
   ST.kills++;if(e.type==='bat')ST.bats++;ach('k1');
-  if(e.type==='boss'){const kd=e.T.kind,id=kd==='vlord'?'vlad':kd==='ignis'?'ignis':'gord';ach(id);if(dmgTaken===RUN.bossDmg)ach(id+'NH');if(player&&player.hp>0&&player.hp<=player.max*0.1)ach('clutch')}
+  if(e.type==='boss'){const kd=e.T.kind,id=kd==='vlord'?'vlad':kd==='ignis'?'ignis':kd==='harval'?'harval':'gord';ach(id);if(dmgTaken===RUN.bossDmg)ach(id+'NH');if(player&&player.hp>0&&player.hp<=player.max*0.1)ach('clutch')}
   if(ST.kills%10===0||ST.kills===100||ST.kills===500){saveNow();achCheck()}};
 const _srA=showResult;showResult=function(win){_srA(win);if(!win)ST.deaths++;else{ST.clears++;
     if(startCh===1&&RUNALL){ach('d'+diffI);if(runTime<=660)ach('fast');if(RUN.ult===0)ach('noult')}
@@ -2021,7 +2167,7 @@ function openAch(){const L=$('achList');L.innerHTML='';let n=0;
 $('bAch').addEventListener('click',openAch);
 $('achClose').addEventListener('click',()=>{$('achOv').hidden=true;paintHome()});
 // grant what earlier progress already proves
-if(SAVE.prog.c1)ach('gord');if(SAVE.prog.c2)ach('vlad');if(SAVE.prog.c3)ach('ignis');
+if(SAVE.prog.c1)ach('gord');if(SAVE.prog.c2)ach('vlad');if(SAVE.prog.c3)ach('ignis');if(SAVE.prog.c4)ach('harval');
 achCheck();achBoot=false;paintAchDot();
 const ITEM_ART='a/643cf41d7e1f.webp';
 // ===================== equipment, bag & item dungeon =====================
